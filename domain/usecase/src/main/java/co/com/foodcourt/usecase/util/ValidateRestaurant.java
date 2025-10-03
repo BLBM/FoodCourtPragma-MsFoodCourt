@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class ValidateRestaurant {
 
+    private static final Pattern NAME_PATTERN = Pattern.compile("^(?!\\d+$).+$");
     private static final Pattern PHONE_PATTERN = Pattern.compile("^\\+?\\d{1,13}$");
     private static final Pattern NIT_PATTERN = Pattern.compile("^\\d+$");
 
@@ -20,9 +21,15 @@ public class ValidateRestaurant {
         }
     }
 
-    public static void validateNit(Long documentId) {
-        if (documentId == null || !NIT_PATTERN.matcher(documentId.toString()).matches()) {
+    public static void validateNit(Long nit) {
+        if (nit == null || !NIT_PATTERN.matcher(nit.toString()).matches()) {
             throw new ValidationException(ValidationMessages.INVALID_NIT.getMessage());
+        }
+    }
+
+    public static void validateName(String name) {
+        if (name == null || !NAME_PATTERN.matcher(name).matches()) {
+            throw new ValidationException(ValidationMessages.INVALID_RESTAURANT_NAME.getMessage());
         }
     }
 
@@ -33,5 +40,6 @@ public class ValidateRestaurant {
         }
         validateNit(restaurant.getNit());
         validatePhone(restaurant.getPhone());
+        validateName(restaurant.getName());
     }
 }
