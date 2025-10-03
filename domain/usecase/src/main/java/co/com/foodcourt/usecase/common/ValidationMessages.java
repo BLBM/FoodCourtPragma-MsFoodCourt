@@ -1,0 +1,18 @@
+package co.com.foodcourt.usecase.common;
+
+import lombok.Getter;
+
+@Getter
+public enum ValidationMessages {
+
+    INVALID_PHONE("Invalid phone number. It must be up to 13 digits and may start with +"),
+    INVALID_RESTAURANT("Restaurant object is null"),
+    INVALID_NIT("Invalid document ID. Only numeric values are allowed");
+
+    private final String message;
+
+    ValidationMessages(final String message) {
+        this.message = message;
+    }
+
+}
