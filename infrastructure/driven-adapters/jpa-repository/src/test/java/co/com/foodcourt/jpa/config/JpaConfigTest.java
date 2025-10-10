@@ -1,5 +1,6 @@
 package co.com.foodcourt.jpa.config;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.core.env.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,11 +11,11 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
 import javax.sql.DataSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 class JpaConfigTest {
+
 
 
     @Mock
@@ -52,11 +53,18 @@ class JpaConfigTest {
         assertEquals(dbSecretUnderTest.getPassword(), secretResult.getPassword());
     }
 
-    @Test
-    void datasourceTest() {
-        final DataSource result = jpaConfigUnderTest.datasource(dbSecretUnderTest, "org.h2.Driver");
 
+    @Test
+    void datasourceShouldReturnConfiguredHikariDataSource() {
+        String driverClass = "org.h2.Driver";
+        DataSource result = jpaConfigUnderTest.datasource(dbSecretUnderTest, driverClass);
         assertNotNull(result);
+        assertTrue(result instanceof HikariDataSource);
+
+        HikariDataSource hikari = (HikariDataSource) result;
+        assertEquals("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", hikari.getJdbcUrl());
+        assertEquals("sa", hikari.getUsername());
+        assertEquals("org.h2.Driver", hikari.getDriverClassName());
     }
 
     @Test

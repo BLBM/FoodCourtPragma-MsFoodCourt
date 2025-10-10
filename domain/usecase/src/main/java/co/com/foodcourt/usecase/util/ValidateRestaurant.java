@@ -15,6 +15,7 @@ public class ValidateRestaurant {
     private static final Pattern NIT_PATTERN = Pattern.compile("^\\d+$");
 
 
+
     public static void validatePhone(String phone) {
         if (phone == null || !PHONE_PATTERN.matcher(phone).matches()) {
             throw new ValidationException(ValidationMessages.INVALID_PHONE.getMessage());
@@ -42,4 +43,6 @@ public class ValidateRestaurant {
         validatePhone(restaurant.getPhone());
         validateName(restaurant.getName());
     }
+
+
 }

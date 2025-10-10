@@ -7,4 +7,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.3.0'
     implementation 'io.micrometer:micrometer-core'
+    implementation "org.mapstruct:mapstruct:$mapStructVersion"
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }

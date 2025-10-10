@@ -26,7 +26,7 @@ public class JpaConfig {
     }
 
     @Bean
-    public DataSource datasource(DBSecret secret, @Value("${spring.datasource.driverClassName}") String driverClass) {
+    public DataSource datasource(DBSecret secret, @Value("${spring.datasource.driver-class-name}") String driverClass) {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(secret.getUrl());
         config.setUsername(secret.getUsername());
@@ -38,10 +38,10 @@ public class JpaConfig {
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(
             DataSource dataSource,
-            @Value("${spring.jpa.databasePlatform}") String dialect) {
+            @Value("${spring.jpa.database-platform}") String dialect) {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource);
-        em.setPackagesToScan("co.com.foodcourt.jpa");
+        em.setPackagesToScan("co.com.foodcourt.jpa.entity");
 
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
