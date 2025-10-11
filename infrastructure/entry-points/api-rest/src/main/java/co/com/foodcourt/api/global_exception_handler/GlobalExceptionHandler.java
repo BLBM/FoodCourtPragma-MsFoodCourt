@@ -53,6 +53,6 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = new HashMap<>();
         body.put(LogConstants.TIMESTAMP.getMessage(), LocalDateTime.now());
         body.put(LogConstants.ERROR.getMessage(), "Unexpected error");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+        return ResponseEntity.badRequest().body(body);
     }
 }

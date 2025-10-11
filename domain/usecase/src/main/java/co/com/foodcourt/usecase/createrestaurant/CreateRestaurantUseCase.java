@@ -14,9 +14,11 @@ public class CreateRestaurantUseCase {
     private final UserRepository userRepository;
 
     public Restaurant saveRestaurant(Restaurant restaurant) {
+        ValidateRestaurant.validateRestaurant(restaurant);
+
         User owner = userRepository.getUserById(restaurant.getOwner().getUserId());
         ValidateUser.validateUser(owner);
-        ValidateRestaurant.validateRestaurant(restaurant);
+
         Restaurant savedRestaurant =  restaurantRepository.saveRestaurant(restaurant);
         savedRestaurant.setOwner(owner);
         return savedRestaurant;

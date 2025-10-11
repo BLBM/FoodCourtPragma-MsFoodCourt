@@ -1,6 +1,10 @@
 package co.com.foodcourt.config;
 
+import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
+import co.com.foodcourt.model.user.gateways.UserRepository;
+import co.com.foodcourt.usecase.createrestaurant.CreateRestaurantUseCase;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +38,15 @@ class UseCasesConfigTest {
         public MyUseCase myUseCase() {
             return new MyUseCase();
         }
+
+        @Bean
+        public UserRepository userRepository() { return Mockito.mock(UserRepository.class);}
+
+        @Bean
+        public RestaurantRepository restaurantRepository(){return  Mockito.mock(RestaurantRepository.class);}
+
+        @Bean
+        public CreateRestaurantUseCase createRestaurantUseCase(){return  Mockito.mock(CreateRestaurantUseCase.class);}
     }
 
     static class MyUseCase {
