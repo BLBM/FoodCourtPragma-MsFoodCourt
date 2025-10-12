@@ -9,7 +9,7 @@ public class ValidateUser {
 
     private static final String ROL_OWNER = "OWNER";
 
-    public static void validateOwner(String role) {
+    private static void validateOwner(String role) {
         if (!ROL_OWNER.equals(role)) {
             throw new ValidationException(ValidationMessages.INVALID_ROL_OWNER_RESTAURANT.getMessage());
         }

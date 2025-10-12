@@ -2,6 +2,7 @@ package co.com.foodcourt.api.global_exception_handler;
 
 
 import co.com.foodcourt.api.common.LogConstants;
+import co.com.foodcourt.api.exception.UnauthorizedException;
 import co.com.foodcourt.model.user.exception.ExternalServiceException;
 import co.com.foodcourt.usecase.exception.ValidationException;
 import org.springframework.http.HttpStatus;
@@ -54,5 +55,13 @@ public class GlobalExceptionHandler {
         body.put(LogConstants.TIMESTAMP.getMessage(), LocalDateTime.now());
         body.put(LogConstants.ERROR.getMessage(), "Unexpected error");
         return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Map<String, Object>> handleUnauthorizedException(UnauthorizedException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put(LogConstants.TIMESTAMP.getMessage(), LocalDateTime.now());
+        body.put(LogConstants.ERROR.getMessage(), "Unauthorized");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }
 }
