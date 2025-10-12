@@ -1,16 +1,16 @@
 package co.com.foodcourt.jpa.restaurantadapter;
 
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
 import java.util.List;
 import java.util.Optional;
 
 import co.com.foodcourt.jpa.entity.RestaurantEntity;
 import co.com.foodcourt.model.restaurant.Restaurant;
+import co.com.foodcourt.model.restaurant.exception.RestaurantNotFoundException;
 import co.com.foodcourt.model.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -141,4 +141,41 @@ class JPARepositoryAdapterTest {
 
         assertThrows(NullPointerException.class, () -> adapter.saveRestaurant(restaurantWithoutOwner));
     }
+
+    ////////////// FEATURE HU3 GET RESTAURANT BY ID TESTS ////////////////////
+
+    @Test
+    void getRestaurantById_success(){
+        long restaurantId = 123L;
+
+        when(repository.findById(restaurantId)).thenReturn(Optional.of(restaurantEntity));
+        when(mapper.map(restaurantEntity, Restaurant.class)).thenReturn(restaurant);
+
+        Restaurant restaurantResult = adapter.getRestaurantById(restaurantId);
+
+        assertNotNull(restaurantResult);
+        assertEquals(restaurantId,restaurantResult.getRestaurantId());
+
+        verify(repository,times(1)).findById(restaurantId);
+        verify(mapper,times(1)).map(restaurantEntity, Restaurant.class);
+    }
+
+    @Test
+    void getRestaurantById_WhenRestaurantNotFound(){
+
+        long restaurantId = 999L;
+        when(repository.findById(restaurantId)).thenReturn(Optional.empty());
+
+        RestaurantNotFoundException ex = assertThrows(
+                RestaurantNotFoundException.class,
+                ()->adapter.getRestaurantById(restaurantId)
+        );
+
+        assertTrue(ex.getMessage().contains(String.valueOf(restaurantId)));
+
+        verify(repository,times(1)).findById(restaurantId);
+
+    }
+
+
 }

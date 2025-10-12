@@ -42,10 +42,9 @@ implements RestaurantRepository
         RestaurantEntity restaurantFound = repository.findById(restaurantId)
                 .orElseThrow(()-> new RestaurantNotFoundException(ErrorConstants.RESTAURANT_NOT_FOUND.getMessage()+restaurantId));
 
+        log.info(LogConstants.RESTAURANT_FOUND.getMessage(),restaurantFound.getRestaurantId());
         Restaurant restaurant = toEntity(restaurantFound);
         restaurant.setOwner(User.builder().userId(restaurantFound.getOwnerId()).build());
-
-        log.info(LogConstants.RESTAURANT_FOUND.getMessage(),restaurant.getRestaurantId());
 
         return restaurant;
     }

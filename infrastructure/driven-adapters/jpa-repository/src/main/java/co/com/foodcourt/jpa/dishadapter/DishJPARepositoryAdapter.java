@@ -22,7 +22,7 @@ public class DishJPARepositoryAdapter   extends AdapterOperations<Dish, DishEnti
 
     @Override
     public Dish save(Dish dish) {
-        log.info("Saving dish: {}", dish.getName());
+        log.info(LogConstants.SAVE_DISH.getMessage(), dish.getName());
 
         DishEntity dishEntity = super.mapper.map(dish, DishEntity.class);
 
@@ -35,6 +35,7 @@ public class DishJPARepositoryAdapter   extends AdapterOperations<Dish, DishEnti
                 .build());
 
         DishEntity savedEntity = repository.save(dishEntity);
+        log.info(LogConstants.DISH_SAVED.getMessage(), savedEntity.getName());
 
         return super.mapper.map(savedEntity, Dish.class);
     }
