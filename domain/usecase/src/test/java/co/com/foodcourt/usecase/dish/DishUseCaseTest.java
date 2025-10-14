@@ -1,6 +1,7 @@
 package co.com.foodcourt.usecase.dish;
 
 
+import co.com.foodcourt.model.category.Category;
 import co.com.foodcourt.model.plate.Dish;
 import co.com.foodcourt.model.plate.gateways.DishRepository;
 import co.com.foodcourt.model.restaurant.Restaurant;
@@ -33,12 +34,14 @@ public class DishUseCaseTest {
 
     private Restaurant restaurant;
     private Dish dish;
-    private User user;
+    private Category category;
+
+
 
     @BeforeEach
     void setUp(){
 
-        user = User.builder()
+        User user = User.builder()
                 .userId(1L)
                 .build();
 
@@ -47,12 +50,17 @@ public class DishUseCaseTest {
                 .owner(user)
                 .build();
 
+        category = Category.builder()
+                .categoryId(1L)
+                .build();
+
         dish =Dish.builder()
                 .name("Pizza")
                 .price(20000)
                 .description("italian pizza")
                 .urlImage("img.png")
                 .restaurant(restaurant)
+                .category(category)
                 .build();
 
     }
@@ -105,8 +113,14 @@ public class DishUseCaseTest {
         Dish result = dishUseCase.saveDish(dish,ownerId);
 
         assertTrue(result.getActive());
+        assertEquals(restaurant, result.getRestaurant());
+        assertEquals(category.getCategoryId(), result.getCategory().getCategoryId());
 
         verify(dishRepository,times(1)).save(any(Dish.class));
 
     }
+
+
+
+
 }

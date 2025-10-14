@@ -33,4 +33,10 @@ public class DishUseCase {
         return  dishRepository.save(dish);
     }
 
+    public Dish updateDish(Long dishId,Dish partialDish, Long ownerId){
+
+
+        return  null;
+    }
+
 }

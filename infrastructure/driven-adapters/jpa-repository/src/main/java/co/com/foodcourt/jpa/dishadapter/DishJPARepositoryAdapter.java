@@ -21,7 +21,7 @@ public class DishJPARepositoryAdapter   extends AdapterOperations<Dish, DishEnti
         }
 
     @Override
-    public Dish save(Dish dish) {
+    public Dish saveDish(Dish dish) {
         log.info(LogConstants.SAVE_DISH.getMessage(), dish.getName());
 
         DishEntity dishEntity = super.mapper.map(dish, DishEntity.class);
