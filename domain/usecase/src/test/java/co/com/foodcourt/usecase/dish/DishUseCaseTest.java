@@ -110,6 +110,7 @@ public class DishUseCaseTest {
         when(restaurantRepository.getRestaurantById(restaurantId)).thenReturn(restaurant);
         when(dishRepository.saveDish(any(Dish.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
 
+
         Dish result = dishUseCase.saveDish(dish,ownerId);
 
         assertTrue(result.getActive());
@@ -119,6 +120,33 @@ public class DishUseCaseTest {
         verify(dishRepository,times(1)).saveDish(any(Dish.class));
 
     }
+
+    /// //////////////////////// FEATURE HU4 UPDATED DISH////////////////////////
+
+    @Test
+    void ShouldUpdateDishSuccessfullyWhenValid() {
+        long restaurantId = 1L;
+        long dishId = 1L;
+        long ownerId = 1L;
+
+        Dish partialDish = Dish.builder()
+                .price(30000)
+                .description("italian pizza with salami")
+                .build();
+
+        when(dishRepository.findById(dishId)).thenReturn(dish);
+        when(restaurantRepository.getRestaurantById(restaurantId)).thenReturn(restaurant);
+        when(dishRepository.save(any(Dish.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Dish updated = dishUseCase.updateDish(dishId, partialDish, ownerId);
+
+        assertEquals(partialDish.getPrice(),updated.getPrice());
+        assertEquals(partialDish.getDescription(),updated.getDescription());
+
+        verify(dishRepository,times(1)).save(any(Dish.class));
+
+    }
+
 
 
 

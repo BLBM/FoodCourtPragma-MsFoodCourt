@@ -8,6 +8,7 @@ import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
 import co.com.foodcourt.usecase.common.ValidationMessages;
 import co.com.foodcourt.usecase.exception.ValidationException;
 import co.com.foodcourt.usecase.util.ValidateDish;
+import co.com.foodcourt.usecase.util.ValidateUser;
 import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DishUseCase {
@@ -20,9 +21,7 @@ public class DishUseCase {
 
         Restaurant restaurant= restaurantRepository.getRestaurantById(dish.getRestaurant().getRestaurantId());
 
-        if(!restaurant.getOwner().getUserId().equals(ownerId)){
-            throw new ValidationException(ValidationMessages.INVALID_OWNER_OF_RESTAURANT.getMessage());
-        }
+        ValidateUser.validateOwner(ownerId,restaurant.getOwner().getUserId());
 
         Category category = Category.builder().categoryId(dish.getCategory().getCategoryId()).build();
 
@@ -30,13 +29,25 @@ public class DishUseCase {
         dish.setRestaurant(restaurant);
         dish.setCategory(category);
 
-        return  dishRepository.save(dish);
+        return  dishRepository.saveDish(dish);
     }
 
     public Dish updateDish(Long dishId,Dish partialDish, Long ownerId){
+        Dish existingDish = dishRepository.findById(dishId);
 
+        Restaurant restaurant= restaurantRepository.getRestaurantById(existingDish.getRestaurant().getRestaurantId());
 
-        return  null;
+        ValidateUser.validateOwner(ownerId,restaurant.getOwner().getUserId());
+
+        if (partialDish.getPrice() != null) {
+            ValidateDish.validatePrice(partialDish.getPrice());
+            existingDish.setPrice(partialDish.getPrice());
+        }
+        if (partialDish.getDescription() != null) {
+            existingDish.setDescription(partialDish.getDescription());
+        }
+
+        return dishRepository.saveDish(existingDish);
     }
 
 }

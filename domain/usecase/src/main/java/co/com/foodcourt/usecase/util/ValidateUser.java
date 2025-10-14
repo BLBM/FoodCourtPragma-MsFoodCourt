@@ -21,4 +21,10 @@ public class ValidateUser {
         }
         validateOwner(user.getRole());
     }
+
+    public static void validateOwner(Long ownerId, Long restaurantOwner){
+        if (!restaurantOwner.equals(ownerId)){
+            throw new ValidationException(ValidationMessages.INVALID_OWNER_OF_RESTAURANT.getMessage());
+        }
+    }
 }

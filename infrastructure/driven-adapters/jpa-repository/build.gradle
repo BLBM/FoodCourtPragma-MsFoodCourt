@@ -8,4 +8,6 @@ dependencies {
 
     testImplementation 'com.h2database:h2:2.2.224'
     testImplementation 'org.reactivecommons.utils:object-mapper:0.1.0'
+    implementation "org.mapstruct:mapstruct:$mapStructVersion"
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
 }

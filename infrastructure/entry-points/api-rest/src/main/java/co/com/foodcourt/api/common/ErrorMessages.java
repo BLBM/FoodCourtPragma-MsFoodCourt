@@ -4,7 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorMessages {
-    INVALID_ROL_OWNER_DISHES("Only owners can create dishes");
+    INVALID_ROL_OWNER_DISHES("Only owners can create dishes"),
+    INVALID_ROL_OWNER_UPDATE_DISHES("Only owners can update dishes");
 
     private final String message;
 
