@@ -1,5 +1,5 @@
 package co.com.foodcourt.api.common;
 
-public enum rol {
+public enum Rol {
     ADMIN,OWNER,EMPLOYEE,CLIENT
 }
