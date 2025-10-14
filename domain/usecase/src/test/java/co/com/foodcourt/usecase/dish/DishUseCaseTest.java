@@ -99,7 +99,7 @@ public class DishUseCaseTest {
         );
 
         assertEquals(ValidationMessages.INVALID_DISH.getMessage(), ex.getMessage());
-        verify(dishRepository, never()).save(any());
+        verify(dishRepository, never()).saveDish(any());
     }
 
     @Test
@@ -108,7 +108,7 @@ public class DishUseCaseTest {
         long ownerId = 1L;
 
         when(restaurantRepository.getRestaurantById(restaurantId)).thenReturn(restaurant);
-        when(dishRepository.save(any(Dish.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
+        when(dishRepository.saveDish(any(Dish.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
 
         Dish result = dishUseCase.saveDish(dish,ownerId);
 
@@ -116,9 +116,12 @@ public class DishUseCaseTest {
         assertEquals(restaurant, result.getRestaurant());
         assertEquals(category.getCategoryId(), result.getCategory().getCategoryId());
 
-        verify(dishRepository,times(1)).save(any(Dish.class));
+        verify(dishRepository,times(1)).saveDish(any(Dish.class));
 
     }
+
+
+
 
 
 
