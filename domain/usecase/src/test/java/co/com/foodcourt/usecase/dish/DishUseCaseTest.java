@@ -9,11 +9,14 @@ import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
 import co.com.foodcourt.model.user.User;
 import co.com.foodcourt.usecase.common.ValidationMessages;
 import co.com.foodcourt.usecase.exception.ValidationException;
+import co.com.foodcourt.usecase.util.ValidateDish;
+import co.com.foodcourt.usecase.util.ValidateUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,6 +38,7 @@ public class DishUseCaseTest {
     private Restaurant restaurant;
     private Dish dish;
     private Category category;
+    private Dish partialDish;
 
 
 
@@ -42,7 +46,7 @@ public class DishUseCaseTest {
     void setUp(){
 
         User user = User.builder()
-                .userId(1L)
+                .userId(10L)
                 .build();
 
         restaurant = Restaurant.builder()
@@ -61,6 +65,11 @@ public class DishUseCaseTest {
                 .urlImage("img.png")
                 .restaurant(restaurant)
                 .category(category)
+                .build();
+
+        partialDish = Dish.builder()
+                .price(30000)
+                .description("italian pizza with salami")
                 .build();
 
     }
@@ -92,7 +101,7 @@ public class DishUseCaseTest {
 
     @Test
     void shouldThrowValidationExceptionWhenRestaurantIsNull() {
-        long ownerId = 1L;
+        long ownerId = 10L;
         ValidationException ex = assertThrows(
                 ValidationException.class,
                 () -> dishUseCase.saveDish(null,ownerId)
@@ -105,7 +114,7 @@ public class DishUseCaseTest {
     @Test
     void shouldCreateDishSuccessfullyWhenValid() {
         long restaurantId= 1L;
-        long ownerId = 1L;
+        long ownerId = 10L;
 
         when(restaurantRepository.getRestaurantById(restaurantId)).thenReturn(restaurant);
         when(dishRepository.saveDish(any(Dish.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
@@ -127,30 +136,59 @@ public class DishUseCaseTest {
     void ShouldUpdateDishSuccessfullyWhenValid() {
         long restaurantId = 1L;
         long dishId = 1L;
-        long ownerId = 1L;
+        long ownerId = 10L;
 
-        Dish partialDish = Dish.builder()
-                .price(30000)
-                .description("italian pizza with salami")
-                .build();
+
 
         when(dishRepository.findById(dishId)).thenReturn(dish);
         when(restaurantRepository.getRestaurantById(restaurantId)).thenReturn(restaurant);
-        when(dishRepository.save(any(Dish.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(dishRepository.saveDish(any(Dish.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
         Dish updated = dishUseCase.updateDish(dishId, partialDish, ownerId);
 
-        assertEquals(partialDish.getPrice(),updated.getPrice());
-        assertEquals(partialDish.getDescription(),updated.getDescription());
+        assertNotNull(updated);
+        assertEquals(partialDish.getPrice(), updated.getPrice());
+        assertEquals(partialDish.getDescription(), updated.getDescription());
 
-        verify(dishRepository,times(1)).save(any(Dish.class));
+        verify(dishRepository).findById(dishId);
+        verify(restaurantRepository).getRestaurantById(restaurantId);
+        verify(dishRepository).saveDish(any(Dish.class));
 
     }
 
+    @Test
+    void shouldThrowUnauthorizedExceptionWhenOwnerIsInvalid() {
+        try (MockedStatic<ValidateUser> userValidator = mockStatic(ValidateUser.class)) {
+            when(dishRepository.findById(1L)).thenReturn(dish);
+            when(restaurantRepository.getRestaurantById(1L)).thenReturn(restaurant);
 
+            userValidator.when(() ->
+                    ValidateUser.validateOwner(99L, 10L)
+            ).thenThrow(new ValidationException("Invalid owner"));
 
+            assertThrows(ValidationException.class,
+                    () -> dishUseCase.updateDish(1L, partialDish, 99L));
 
+            userValidator.verify(() -> ValidateUser.validateOwner(99L, 10L));
+        }
+    }
 
+    @Test
+    void shouldThrowValidationExceptionWhenPriceInvalid() {
+        try (MockedStatic<ValidateDish> dishValidator = mockStatic(ValidateDish.class)) {
+            partialDish.setPrice(-1000);
+
+            when(dishRepository.findById(1L)).thenReturn(dish);
+            when(restaurantRepository.getRestaurantById(1L)).thenReturn(restaurant);
+
+            dishValidator.when(() -> ValidateDish.validatePrice(-1000))
+                    .thenThrow(new ValidationException("Invalid price"));
+
+            assertThrows(ValidationException.class,
+                    () -> dishUseCase.updateDish(1L, partialDish, 10L));
+        }
+    }
 
 
 

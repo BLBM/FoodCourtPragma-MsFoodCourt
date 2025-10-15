@@ -2,10 +2,10 @@ package co.com.foodcourt.api.controller;
 
 import co.com.foodcourt.api.dto.CreateDishRequest;
 import co.com.foodcourt.api.dto.CreateDishResponse;
+import co.com.foodcourt.api.dto.UpdateDishRequest;
 import co.com.foodcourt.api.exception.UnauthorizedException;
 import co.com.foodcourt.api.global_exception_handler.GlobalExceptionHandler;
 import co.com.foodcourt.model.plate.Dish;
-import co.com.foodcourt.model.restaurant.Restaurant;
 import co.com.foodcourt.usecase.dish.DishUseCase;
 import co.com.foodcourt.usecase.exception.ValidationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,7 +40,7 @@ public class DishControllerTest {
     private DishUseCase dishUseCase;
 
     private CreateDishRequest createDishRequest;
-    private CreateDishResponse createDishResponse;
+    private UpdateDishRequest updateDishRequest;
     private Dish dish;
 
 
@@ -55,12 +55,14 @@ public class DishControllerTest {
                 "url.jpg",
                 2L);
 
-         dish = Dish.builder().name("Cheeseburger").build();
+         dish = Dish.builder().name("Cheeseburger").price(25000).description("description").build();
 
-         createDishResponse = new CreateDishResponse(
+        CreateDishResponse createDishResponse = new CreateDishResponse(
                 "Cheeseburger",
                 25000,
               "Delicious burger");
+
+        updateDishRequest = new UpdateDishRequest(20000, "New description");
 
 
     }
@@ -111,6 +113,54 @@ public class DishControllerTest {
                 .andExpect(jsonPath("$.error:").value("Unauthorized"));
     }
 
+
+    /// /////////////////// Feature hu4 patch dish/////////////////////
+
+    @Test
+    void shouldUpdateDishSuccessfully() throws Exception {
+        dish.setPrice(20000);
+        dish.setDescription("New description");
+
+        when(dishUseCase.updateDish(anyLong(), any(Dish.class), anyLong())).thenReturn(dish);
+
+        mockMvc.perform(patch("/api/v1/dishes/{dishId}", 1L)
+                        .header("X-User-role", "OWNER")
+                        .header("X-User-id", 10L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDishRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.price").value(20000))
+                .andExpect(jsonPath("$.description").value("New description"));
+    }
+
+
+    @Test
+    void shouldRejectWhenUserIsNotOwner() throws Exception {
+
+        mockMvc.perform(patch("/api/v1/dishes/{dishId}", 1L)
+                        .header("X-User-role", "EMPLOYEE")
+                        .header("X-User-id", 10L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDishRequest)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.details:").value("Only owners can update dishes"));
+    }
+
+
+    @Test
+    void shouldHandleValidationExceptionFromHandler_patchOperation() throws Exception {
+
+        when(dishUseCase.updateDish(anyLong(), any(Dish.class), anyLong()))
+                .thenThrow(new ValidationException("Custom business validation failed"));
+
+        mockMvc.perform(patch("/api/v1/dishes/{dishId}", 1L)
+                        .header("X-User-role", "OWNER")
+                        .header("X-User-id", 10L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDishRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.details:").value("Custom business validation failed"));
+    }
 
 
 

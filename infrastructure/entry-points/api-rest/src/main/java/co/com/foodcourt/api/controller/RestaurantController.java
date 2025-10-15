@@ -81,7 +81,7 @@ public class RestaurantController {
                                                                      @Valid @RequestBody CreateRestaurantRequest restaurantRequest) {
 
         if(!Rol.ADMIN.name().equalsIgnoreCase(role)){
-            throw  new UnauthorizedException(ErrorMessages.INVALID_ROL_OWNER_DISHES.getMessage());
+            throw  new UnauthorizedException(ErrorMessages.INVALID_RESTAURANT_ROL.getMessage());
         }
         log.info(LogConstants.CREATE_RESTAURANT_REQUEST.getMessage(),restaurantRequest.name());
         Restaurant restaurantCreated = createRestaurantUseCase.saveRestaurant(SaveRestaurantMapper.INSTANCE.toDomain(restaurantRequest));

@@ -2,6 +2,7 @@ package co.com.foodcourt.api.controller;
 
 import co.com.foodcourt.api.dto.CreateRestaurantRequest;
 import co.com.foodcourt.api.dto.CreateRestaurantResponse;
+import co.com.foodcourt.api.exception.UnauthorizedException;
 import co.com.foodcourt.api.global_exception_handler.GlobalExceptionHandler;
 import co.com.foodcourt.model.restaurant.Restaurant;
 import co.com.foodcourt.model.user.User;
@@ -19,6 +20,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -80,6 +82,8 @@ public class RestaurantControllerTest {
 
 
         mockMvc.perform(post("/api/v1/restaurants")
+                        .header("X-User-id", 10L)
+                        .header("X-User-role", "ADMIN")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createRequest)))
                 .andExpect(status().isCreated())
@@ -94,6 +98,8 @@ public class RestaurantControllerTest {
                 .thenThrow(new ValidationException("Custom business validation failed"));
 
         mockMvc.perform(post("/api/v1/restaurants")
+                        .header("X-User-id", 10L)
+                        .header("X-User-role", "ADMIN")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createRequest)))
                 .andExpect(status().isBadRequest())
@@ -106,6 +112,8 @@ public class RestaurantControllerTest {
                 .thenThrow(new RuntimeException("Unexpected error"));
 
         mockMvc.perform(post("/api/v1/restaurants")
+                        .header("X-User-id", 10L)
+                        .header("X-User-role", "ADMIN")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createRequest)))
                 .andExpect(status().isInternalServerError())
@@ -118,6 +126,8 @@ public class RestaurantControllerTest {
                 .thenThrow(new ExternalServiceException("Unexpected error"));
 
         mockMvc.perform(post("/api/v1/restaurants")
+                        .header("X-User-id", 10L)
+                        .header("X-User-role", "ADMIN")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createRequest)))
                 .andExpect(status().isBadRequest())
@@ -138,10 +148,27 @@ public class RestaurantControllerTest {
         """;
 
         mockMvc.perform(post("/api/v1/restaurants")
+                        .header("X-User-id", 10L)
+                        .header("X-User-role", "ADMIN")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidRequest))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$['error:'].phone").value("phone is required"))
                 .andExpect(jsonPath("$['timestamp:']").exists());
+    }
+
+    @Test
+    void shouldHandleUnauthorizedExceptionFromHandler() throws Exception {
+
+        when(createRestaurantUseCase.saveRestaurant(any(Restaurant.class)))
+                .thenThrow(new UnauthorizedException("Unauthorized"));
+
+        mockMvc.perform(post("/api/v1/restaurants")
+                        .header("X-User-id", 10L)
+                        .header("X-User-role", "EMPLOYEE")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createRequest)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error:").value("Unauthorized"));
     }
 }

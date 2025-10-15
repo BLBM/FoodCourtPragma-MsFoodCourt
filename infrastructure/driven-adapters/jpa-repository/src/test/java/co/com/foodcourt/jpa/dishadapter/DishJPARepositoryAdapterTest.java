@@ -2,11 +2,14 @@ package co.com.foodcourt.jpa.dishadapter;
 
 
 
+import co.com.foodcourt.jpa.common.ErrorConstants;
 import co.com.foodcourt.jpa.entity.CategoryEntity;
 import co.com.foodcourt.jpa.entity.DishEntity;
 import co.com.foodcourt.jpa.entity.RestaurantEntity;
+import co.com.foodcourt.jpa.mapper.DishEntityMapper;
 import co.com.foodcourt.model.category.Category;
 import co.com.foodcourt.model.plate.Dish;
+import co.com.foodcourt.model.plate.exception.DishNotFoundException;
 import co.com.foodcourt.model.restaurant.Restaurant;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,13 +17,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DishJPARepositoryAdapterTest {
@@ -30,6 +35,9 @@ class DishJPARepositoryAdapterTest {
 
     @Mock
     private ObjectMapper mapper;
+
+    @Spy
+    private DishEntityMapper dishEntityMapper;
 
     @InjectMocks
     private DishJPARepositoryAdapter adapter;
@@ -69,7 +77,7 @@ class DishJPARepositoryAdapterTest {
         when(repository.save(dishEntity)).thenReturn(dishEntity);
         when(mapper.map(dishEntity, Dish.class)).thenReturn(dish);
 
-        Dish result = adapter.save(dish);
+        Dish result = adapter.saveDish(dish);
 
         assertNotNull(result);
         assertEquals("Cheeseburger", result.getName());
@@ -84,6 +92,35 @@ class DishJPARepositoryAdapterTest {
         assertThrows(DataIntegrityViolationException.class, () -> adapter.save(dish));
     }
 
+    /// ///////////////// FEATURE  HU4 //////////////////////////
+
+
+    @Test
+    void shouldFindDishByIdSuccessfully() {
+        when(repository.findById(1L)).thenReturn(Optional.of(dishEntity));
+        when(dishEntityMapper.toDomain(dishEntity)).thenReturn(dish);
+
+        Dish result = adapter.findById(1L);
+
+        assertNotNull(result);
+        assertEquals(10L, result.getDishId());
+        assertEquals("Cheeseburger", result.getName());
+        verify(repository, times(1)).findById(1L);
+    }
+
+    @Test
+    void shouldThrowDishNotFoundExceptionWhenDishDoesNotExist() {
+
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        DishNotFoundException exception = assertThrows(
+                DishNotFoundException.class,
+                () -> adapter.findById(99L)
+        );
+
+        assertEquals(ErrorConstants.DISH_NOT_FOUND.getMessage(), exception.getMessage());
+        verify(repository, times(1)).findById(99L);
+    }
 
 
 
