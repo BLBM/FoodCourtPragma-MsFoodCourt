@@ -65,11 +65,13 @@ public class DishUseCaseTest {
                 .urlImage("img.png")
                 .restaurant(restaurant)
                 .category(category)
+                .active(true)
                 .build();
 
         partialDish = Dish.builder()
                 .price(30000)
                 .description("italian pizza with salami")
+                .active(true)
                 .build();
 
     }
@@ -188,6 +190,30 @@ public class DishUseCaseTest {
             assertThrows(ValidationException.class,
                     () -> dishUseCase.updateDish(1L, partialDish, 10L));
         }
+    }
+
+
+    /// ////////// FEATURE HU7/////////////////////////
+
+
+    @Test
+    void shouldNotUpdateFieldsWhenNullValuesProvided() {
+        Dish partialDish = Dish.builder()
+                .price(null)
+                .description(null)
+                .active(null)
+                .build();
+
+        when(dishRepository.findById(1L)).thenReturn(dish);
+        when(restaurantRepository.getRestaurantById(1L)).thenReturn(restaurant);
+        when(dishRepository.saveDish(any(Dish.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Dish result = dishUseCase.updateDish(1L, partialDish, 10L);
+
+        assertEquals(20000, result.getPrice()); // no cambió
+        assertEquals("italian pizza", result.getDescription());
+        assertTrue(result.getActive());
+        verify(dishRepository).saveDish(result);
     }
 
 

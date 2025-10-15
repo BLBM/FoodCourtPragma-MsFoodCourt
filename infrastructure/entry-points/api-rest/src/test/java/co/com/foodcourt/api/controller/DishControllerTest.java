@@ -62,7 +62,7 @@ public class DishControllerTest {
                 25000,
               "Delicious burger");
 
-        updateDishRequest = new UpdateDishRequest(20000, "New description");
+        updateDishRequest = new UpdateDishRequest(20000, "New description",true);
 
 
     }
@@ -120,6 +120,7 @@ public class DishControllerTest {
     void shouldUpdateDishSuccessfully() throws Exception {
         dish.setPrice(20000);
         dish.setDescription("New description");
+        dish.setActive(true);
 
         when(dishUseCase.updateDish(anyLong(), any(Dish.class), anyLong())).thenReturn(dish);
 
@@ -130,7 +131,8 @@ public class DishControllerTest {
                         .content(objectMapper.writeValueAsString(updateDishRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.price").value(20000))
-                .andExpect(jsonPath("$.description").value("New description"));
+                .andExpect(jsonPath("$.description").value("New description"))
+                .andExpect(jsonPath("$.active").value(true));
     }
 
 

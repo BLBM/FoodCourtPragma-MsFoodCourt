@@ -46,6 +46,9 @@ public class DishUseCase {
         if (partialDish.getDescription() != null) {
             existingDish.setDescription(partialDish.getDescription());
         }
+        if (partialDish.getActive() != null) {
+            existingDish.setActive(partialDish.getActive());
+        }
 
         return dishRepository.saveDish(existingDish);
     }

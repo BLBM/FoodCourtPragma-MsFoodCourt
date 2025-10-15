@@ -52,6 +52,7 @@ public class RestaurantControllerTest {
                 "restaurant",
                 "av always viva",
                 1L,
+
                 "url.com",
                 "+573155544545",
                 900888777L

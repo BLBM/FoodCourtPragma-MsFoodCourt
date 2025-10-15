@@ -76,8 +76,7 @@ public class RestaurantController {
             @Parameter(name = "X-User-role", description = SwaggerConstants.USER_ROLE_DESCRIPTION, example = "OWNER", required = true)
     })
     @PostMapping
-    public ResponseEntity<CreateRestaurantResponse> createRestaurant(@RequestHeader("X-User-id") Long ownerId,
-                                                                     @RequestHeader("X-User-role") String role,
+    public ResponseEntity<CreateRestaurantResponse> createRestaurant(@RequestHeader("X-User-role") String role,
                                                                      @Valid @RequestBody CreateRestaurantRequest restaurantRequest) {
 
         if(!Rol.ADMIN.name().equalsIgnoreCase(role)){
