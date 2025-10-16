@@ -20,7 +20,6 @@ class PageableServiceTest {
     private PageableService pageableService;
 
 
-
     @Test
     void shouldPaginateSuccessfullyWhenPageIsWithinRange() {
         List<String> items = List.of("A", "B", "C", "D", "E");

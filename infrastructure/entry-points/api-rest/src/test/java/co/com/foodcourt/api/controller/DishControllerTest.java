@@ -1,7 +1,6 @@
 package co.com.foodcourt.api.controller;
 
 import co.com.foodcourt.api.dto.CreateDishRequest;
-import co.com.foodcourt.api.dto.CreateDishResponse;
 import co.com.foodcourt.api.dto.UpdateDishRequest;
 import co.com.foodcourt.api.exception.UnauthorizedException;
 import co.com.foodcourt.api.global_exception_handler.GlobalExceptionHandler;
@@ -60,11 +59,6 @@ public class DishControllerTest {
                 2L);
 
          dish = Dish.builder().name("Cheeseburger").price(25000).description("description").build();
-
-        CreateDishResponse createDishResponse = new CreateDishResponse(
-                "Cheeseburger",
-                25000,
-              "Delicious burger");
 
         updateDishRequest = new UpdateDishRequest(20000, "New description",true);
 
@@ -167,8 +161,6 @@ public class DishControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.details:").value("Custom business validation failed"));
     }
-
-
 
 
 }

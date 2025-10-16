@@ -1,6 +1,6 @@
 package co.com.foodcourt.config;
 
-import co.com.foodcourt.api.service.RestaurantPageableService;
+
 import co.com.foodcourt.model.plate.gateways.DishRepository;
 import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
 import co.com.foodcourt.model.user.gateways.UserRepository;
