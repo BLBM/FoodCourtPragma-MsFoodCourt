@@ -26,14 +26,12 @@ class RestaurantPageableServiceTest {
     @Mock
     private CreateRestaurantUseCase createRestaurantUseCase;
 
-    private PageableService pageableService;
-
     @InjectMocks
     private RestaurantPageableService restaurantPageableService;
 
     @BeforeEach
     void setUp() {
-        pageableService = new PageableService();
+        PageableService pageableService = new PageableService();
         restaurantPageableService = new RestaurantPageableService(createRestaurantUseCase, pageableService);
     }
 
@@ -47,7 +45,6 @@ class RestaurantPageableServiceTest {
         when(createRestaurantUseCase.execute()).thenReturn(mockRestaurants);
 
         PageResponse<GetAllRestaurantsData> result = restaurantPageableService.getRestaurants(1, 3);
-
 
         assertEquals(2, result.content().size());
         assertEquals("El Corral", result.content().get(0).name());

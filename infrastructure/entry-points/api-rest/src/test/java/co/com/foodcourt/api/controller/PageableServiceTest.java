@@ -3,6 +3,7 @@ package co.com.foodcourt.api.controller;
 
 import co.com.foodcourt.api.dto.PageResponse;
 import co.com.foodcourt.api.service.PageableService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -13,12 +14,15 @@ import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
+
 class PageableServiceTest {
 
-    @MockitoBean
     private PageableService pageableService;
 
+    @BeforeEach
+    void setUp() {
+        pageableService = new PageableService();
+    }
 
     @Test
     void shouldPaginateSuccessfullyWhenPageIsWithinRange() {

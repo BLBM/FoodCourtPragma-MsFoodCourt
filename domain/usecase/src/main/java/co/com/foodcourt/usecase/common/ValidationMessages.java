@@ -13,7 +13,9 @@ public enum ValidationMessages {
     INVALID_NIT("Invalid document ID. Only numeric values are allowed"),
     INVALID_DISH_PRICE("Invalid dish its must bea an integer and greater than zero "),
     INVALID_DISH("Dish object is null"),
-    INVALID_OWNER_OF_RESTAURANT("This user isn´t owner from this restaurant ");
+    INVALID_OWNER_OF_RESTAURANT("This user isn´t owner from this restaurant "),
+    DISHES_NOT_FOUND_FOR_RESTAURANT("No dishes found for restaurant: {} "),
+    INVALID_RESTAURANT_PARAM("Restaurant name must be provided");
 
     private final String message;
 

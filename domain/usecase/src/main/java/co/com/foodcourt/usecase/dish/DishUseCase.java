@@ -6,6 +6,7 @@ import co.com.foodcourt.model.plate.exception.DishNotFoundException;
 import co.com.foodcourt.model.plate.gateways.DishRepository;
 import co.com.foodcourt.model.restaurant.Restaurant;
 import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
+import co.com.foodcourt.usecase.common.ValidationMessages;
 import co.com.foodcourt.usecase.exception.ValidationException;
 import co.com.foodcourt.usecase.util.ValidateDish;
 import co.com.foodcourt.usecase.util.ValidateUser;
@@ -58,19 +59,16 @@ public class DishUseCase {
 
     
     public List<Dish> getAllDishesByRestaurant(String restaurantName, Long categoryId) {
-
         if (restaurantName == null || restaurantName.isBlank()) {
-            throw new ValidationException("Restaurant name must be provided");
+            throw new ValidationException(ValidationMessages.INVALID_RESTAURANT_PARAM.getMessage());
         }
-
         List<Dish> dishes = (categoryId == null)
                 ? dishRepository.findByRestaurantName(restaurantName)
                 : dishRepository.findByRestaurantNameAndCategoryId(restaurantName, categoryId);
 
         if (dishes.isEmpty()) {
-            throw new DishNotFoundException("No dishes found for restaurant " + restaurantName);
+            throw new DishNotFoundException(ValidationMessages.DISHES_NOT_FOUND_FOR_RESTAURANT.getMessage() + restaurantName);
         }
-
         return dishes;
     }
 

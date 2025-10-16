@@ -10,6 +10,7 @@ public final class DishQueries {
         JOIN FETCH d.restaurantId r
         JOIN FETCH d.categoryId c
         WHERE LOWER(r.name) = LOWER(:restaurantName)
+            AND d.active = TRUE
         ORDER BY d.name ASC
    """;
 
@@ -20,6 +21,7 @@ public final class DishQueries {
         JOIN FETCH d.categoryId c
         WHERE LOWER(r.name) = LOWER(:restaurantName)
           AND c.categoryId = :categoryId
+          AND d.active = TRUE
         ORDER BY d.name ASC
    """;
 }

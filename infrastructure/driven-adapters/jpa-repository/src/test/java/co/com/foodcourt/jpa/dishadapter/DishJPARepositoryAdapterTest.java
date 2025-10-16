@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -51,8 +52,8 @@ class DishJPARepositoryAdapterTest {
     void setUp(){
         Restaurant restaurant = Restaurant.builder().restaurantId(1L).build();
         Category category = Category.builder().categoryId(2L).build();
-        RestaurantEntity restaurantEntity = RestaurantEntity.builder().restaurantId(1L).build();
-        CategoryEntity categoryEntity = CategoryEntity.builder().categoryId(2L).build();
+        RestaurantEntity restaurantEntity = RestaurantEntity.builder().restaurantId(1L).name("El Corral").build();
+        CategoryEntity categoryEntity = CategoryEntity.builder().categoryId(2L).name("FastFood").build();
 
          dish = Dish.builder()
                 .dishId(10L)
@@ -122,6 +123,61 @@ class DishJPARepositoryAdapterTest {
         verify(repository, times(1)).findById(99L);
     }
 
+    /// ///////////////////////// FEATURE HU 10////////////////////////////////
 
+    @Test
+    void shouldFindDishesByRestaurantNameSuccessfully() {
+        List<DishEntity> dishEntities = List.of(dishEntity);
+        when(repository.findByRestaurantName("El Corral")).thenReturn(dishEntities);
+        when(mapper.map(dishEntity, Dish.class)).thenReturn(dish);
+        when(mapper.map(dishEntity.getCategoryId(), Category.class)).thenReturn(dish.getCategory());
+        when(mapper.map(dishEntity.getRestaurantId(), Restaurant.class)).thenReturn(dish.getRestaurant());
+
+        List<Dish> result = adapter.findByRestaurantName("El Corral");
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Cheeseburger", result.getFirst().getName());
+        assertNotNull(result.getFirst().getCategory());
+        assertNotNull(result.getFirst().getRestaurant());
+        verify(repository).findByRestaurantName("El Corral");
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoDishesByRestaurantName() {
+        when(repository.findByRestaurantName("NonExistent")).thenReturn(List.of());
+
+        List<Dish> result = adapter.findByRestaurantName("NonExistent");
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void shouldFindDishesByRestaurantNameAndCategoryIdSuccessfully() {
+        List<DishEntity> dishEntities = List.of(dishEntity);
+        when(repository.findByRestaurantNameAndCategoryId("El Corral", 2L)).thenReturn(dishEntities);
+        when(mapper.map(dishEntity, Dish.class)).thenReturn(dish);
+        when(mapper.map(dishEntity.getCategoryId(), Category.class)).thenReturn(dish.getCategory());
+        when(mapper.map(dishEntity.getRestaurantId(), Restaurant.class)).thenReturn(dish.getRestaurant());
+
+        List<Dish> result = adapter.findByRestaurantNameAndCategoryId("El Corral", 2L);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Cheeseburger", result.getFirst().getName());
+        assertEquals(2L, result.getFirst().getCategory().getCategoryId());
+        verify(repository).findByRestaurantNameAndCategoryId("El Corral", 2L);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoDishesByRestaurantNameAndCategoryId() {
+        when(repository.findByRestaurantNameAndCategoryId("El Corral", 99L)).thenReturn(List.of());
+
+        List<Dish> result = adapter.findByRestaurantNameAndCategoryId("El Corral", 99L);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
 
 }

@@ -1,11 +1,14 @@
 package co.com.foodcourt.api.controller;
 
 import co.com.foodcourt.api.dto.CreateDishRequest;
+import co.com.foodcourt.api.dto.GetAllDishesData;
+import co.com.foodcourt.api.dto.PageResponse;
 import co.com.foodcourt.api.dto.UpdateDishRequest;
 import co.com.foodcourt.api.exception.UnauthorizedException;
 import co.com.foodcourt.api.global_exception_handler.GlobalExceptionHandler;
 import co.com.foodcourt.api.service.DishPageableService;
 import co.com.foodcourt.model.plate.Dish;
+import co.com.foodcourt.model.plate.exception.DishNotFoundException;
 import co.com.foodcourt.usecase.dish.DishUseCase;
 import co.com.foodcourt.usecase.exception.ValidationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,6 +21,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -162,6 +166,54 @@ public class DishControllerTest {
                 .andExpect(jsonPath("$.details:").value("Custom business validation failed"));
     }
 
+    ///////////////////////////////// FEATURE HU 10 //////////////////////////////////////////
+
+    @Test
+    void shouldReturnOkWhenRoleIsClient() throws Exception {
+        PageResponse<GetAllDishesData> mockResponse = new PageResponse<>(
+                List.of(new GetAllDishesData("Burger", "img.png", 10000,"fastFood")),
+                1, 10, 1, 1, false, false, true, true
+        );
+
+        when(dishPageableService.getDishes("El Corral", null, 1, 10)).thenReturn(mockResponse);
+
+        mockMvc.perform(get("/api/v1/dishes")
+                        .header("X-User-role", "CLIENT")
+                        .param("restaurantName", "El Corral")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name").value("Burger"));
+    }
+
+
+    @Test
+    void shouldHandleUnauthorizedExceptionFromHandler_getAllDishes() throws Exception {
+
+        when(dishUseCase.saveDish(any(Dish.class), anyLong()))
+                .thenThrow(new UnauthorizedException("Unauthorized"));
+
+        mockMvc.perform(get("/api/v1/dishes")
+                        .header("X-User-role", "OWNER")
+                        .param("restaurantName", "El Corral")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createDishRequest)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error:").value("Unauthorized"));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenNoDishesAvailable() throws Exception {
+        when(dishPageableService.getDishes("El Corral", null, 1, 10))
+                .thenThrow(new DishNotFoundException("No dishes found for restaurant: El Corral"));
+
+        mockMvc.perform(get("/api/v1/dishes")
+                        .header("X-User-role", "CLIENT")
+                        .param("restaurantName", "El Corral")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error:").value("Business validation error"))
+                .andExpect(jsonPath("$.details:").value("No dishes found for restaurant: El Corral"));
+    }
 
 }
 
