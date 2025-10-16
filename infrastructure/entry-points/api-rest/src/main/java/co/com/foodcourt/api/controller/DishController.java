@@ -8,8 +8,10 @@ import co.com.foodcourt.api.dto.*;
 import co.com.foodcourt.api.exception.UnauthorizedException;
 import co.com.foodcourt.api.mapper.SaveDishMapper;
 import co.com.foodcourt.api.mapper.UpdateDishMapper;
+import co.com.foodcourt.api.service.DishPageableService;
 import co.com.foodcourt.model.plate.Dish;
 import co.com.foodcourt.usecase.dish.DishUseCase;
+import co.com.foodcourt.usecase.exception.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.*;
 public class DishController {
 
     private final DishUseCase dishUseCase;
+    private final DishPageableService dishPageableService;
 
     @Operation(
             summary = SwaggerConstants.CREATE_DISH_SUMMARY,
@@ -135,6 +138,25 @@ public class DishController {
         Dish disCreated = dishUseCase.updateDish(dishId,UpdateDishMapper.INSTANCE.toDomain(partialDish),ownerId);
         log.info(LogConstants.UPDATE_DISH_SUCCESS.getMessage(),dishId);
         return ResponseEntity.status(HttpStatus.OK).body(UpdateDishMapper.INSTANCE.toResponse(disCreated));
+    }
+
+    @GetMapping
+    public ResponseEntity<PageResponse<GetAllDishesData>> listDishes(
+            @RequestHeader(name = "X-User-role") String role,
+            @RequestParam(name = "restaurantName") String restaurantName,
+            @RequestParam(name = "categoryId", required = false) Long categoryId,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
+
+        if(!Rol.CLIENT.name().equalsIgnoreCase(role)){
+            throw  new UnauthorizedException(ErrorMessages.INVALID_ROL_SHOW_RESTAURANTS.getMessage());
+        }
+
+        log.info(LogConstants.GET_ALL_DISHES_REQUEST.getMessage());
+        PageResponse<GetAllDishesData> response =
+                dishPageableService.getDishes(restaurantName, categoryId, page, size);
+        log.info(LogConstants.GET_ALL_DISHES_SUCCESS.getMessage());
+        return ResponseEntity.ok(response);
     }
 
 }

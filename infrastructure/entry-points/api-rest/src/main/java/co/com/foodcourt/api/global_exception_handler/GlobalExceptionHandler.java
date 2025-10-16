@@ -3,6 +3,7 @@ package co.com.foodcourt.api.global_exception_handler;
 
 import co.com.foodcourt.api.common.LogConstants;
 import co.com.foodcourt.api.exception.UnauthorizedException;
+import co.com.foodcourt.model.plate.exception.DishNotFoundException;
 import co.com.foodcourt.model.user.exception.ExternalServiceException;
 import co.com.foodcourt.usecase.exception.ValidationException;
 import lombok.extern.slf4j.Slf4j;
@@ -67,5 +68,14 @@ public class GlobalExceptionHandler {
         body.put(LogConstants.ERROR.getMessage(), "Unauthorized");
         body.put(LogConstants.DETAILS.getMessage(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
+
+    @ExceptionHandler(DishNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleDishNotFoundException(DishNotFoundException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put(LogConstants.TIMESTAMP.getMessage(), LocalDateTime.now());
+        body.put(LogConstants.ERROR.getMessage(), "Business validation error");
+        body.put(LogConstants.DETAILS.getMessage(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 }

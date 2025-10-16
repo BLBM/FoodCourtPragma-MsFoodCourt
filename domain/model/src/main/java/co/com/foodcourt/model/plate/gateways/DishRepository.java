@@ -2,10 +2,15 @@ package co.com.foodcourt.model.plate.gateways;
 
 import co.com.foodcourt.model.plate.Dish;
 
+import java.util.List;
+
 public interface DishRepository {
     Dish saveDish(Dish dish);
 
     Dish findById(Long dishId);
 
-    Dish save(Dish dish);
+    List<Dish> findByRestaurantName(String restaurantName);
+
+    List<Dish> findByRestaurantNameAndCategoryId(String restaurantName, Long CategoryId);
+
 }

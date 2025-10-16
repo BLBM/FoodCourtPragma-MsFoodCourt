@@ -24,7 +24,6 @@ public class SwaggerConstants {
             """;
     public static final String CREATE_DISH_SUMMARY = "Create a new dish";
 
-    public static final String USER_ID_DESCRIPTION = "Owner user ID performing the request";
     public static final String USER_ROLE_DESCRIPTION = "Role of the authenticated user";
 
 

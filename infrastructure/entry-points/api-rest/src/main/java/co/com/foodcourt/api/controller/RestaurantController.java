@@ -3,11 +3,10 @@ import co.com.foodcourt.api.common.ErrorMessages;
 import co.com.foodcourt.api.common.LogConstants;
 import co.com.foodcourt.api.common.Rol;
 import co.com.foodcourt.api.common.SwaggerConstants;
-import co.com.foodcourt.api.dto.CreateRestaurantRequest;
-import co.com.foodcourt.api.dto.CreateRestaurantResponse;
-import co.com.foodcourt.api.dto.ErrorResponse;
+import co.com.foodcourt.api.dto.*;
 import co.com.foodcourt.api.exception.UnauthorizedException;
 import co.com.foodcourt.api.mapper.SaveRestaurantMapper;
+import co.com.foodcourt.api.service.RestaurantPageableService;
 import co.com.foodcourt.model.restaurant.Restaurant;
 import co.com.foodcourt.usecase.createrestaurant.CreateRestaurantUseCase;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 public class RestaurantController {
 
     private final CreateRestaurantUseCase createRestaurantUseCase;
+    private final RestaurantPageableService restaurantPageableService;
 
     @Operation(
             summary = SwaggerConstants.CREATE_RESTAURANT_SUMMARY,
@@ -89,4 +89,16 @@ public class RestaurantController {
 
     }
 
+    @GetMapping
+    public ResponseEntity<PageResponse<GetAllRestaurantsData>> listRestaurants(
+            @RequestHeader(name = "X-User-role") String role,
+            @RequestParam(name = "page",defaultValue = "1") int page,
+            @RequestParam(name = "size",defaultValue = "3") int size) {
+
+        if(!Rol.CLIENT.name().equalsIgnoreCase(role)){
+            throw  new UnauthorizedException(ErrorMessages.INVALID_ROL_SHOW_RESTAURANTS.getMessage());
+        }
+        log.info(LogConstants.GET_ALL_RESTAURANT_REQUEST.getMessage());
+        return ResponseEntity.ok(restaurantPageableService.getRestaurants(page, size));
+    }
 }

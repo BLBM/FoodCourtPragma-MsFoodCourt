@@ -12,6 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Repository
 public class JPARepositoryAdapter extends AdapterOperations<Restaurant, RestaurantEntity, Long, JPARepository>
@@ -47,5 +50,13 @@ implements RestaurantRepository
         restaurant.setOwner(User.builder().userId(restaurantFound.getOwnerId()).build());
 
         return restaurant;
+    }
+
+    @Override
+    public List<Restaurant> findAllOrderedByNameAsc() {
+        return repository.findAllByOrderByNameAsc()
+                .stream()
+                .map(entity -> super.mapper.map(entity, Restaurant.class))
+                .collect(Collectors.toList());
     }
 }
