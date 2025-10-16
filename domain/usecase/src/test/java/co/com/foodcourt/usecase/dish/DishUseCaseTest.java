@@ -3,6 +3,7 @@ package co.com.foodcourt.usecase.dish;
 
 import co.com.foodcourt.model.category.Category;
 import co.com.foodcourt.model.plate.Dish;
+import co.com.foodcourt.model.plate.exception.DishNotFoundException;
 import co.com.foodcourt.model.plate.gateways.DishRepository;
 import co.com.foodcourt.model.restaurant.Restaurant;
 import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
@@ -18,6 +19,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -214,6 +217,91 @@ public class DishUseCaseTest {
         assertEquals("italian pizza", result.getDescription());
         assertTrue(result.getActive());
         verify(dishRepository).saveDish(result);
+    }
+
+    /// ////////// FEATURE HU10 - getAllDishesByRestaurant /////////////////////////
+
+    @Test
+    void shouldGetAllDishesByRestaurantNameSuccessfully() {
+        String restaurantName = "El Corral";
+        List<Dish> dishes = List.of(dish);
+        when(dishRepository.findByRestaurantName(restaurantName)).thenReturn(dishes);
+
+        List<Dish> result = dishUseCase.getAllDishesByRestaurant(restaurantName, null);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Pizza", result.getFirst().getName());
+        verify(dishRepository).findByRestaurantName(restaurantName);
+        verify(dishRepository, never()).findByRestaurantNameAndCategoryId(anyString(), anyLong());
+    }
+
+    @Test
+    void shouldGetAllDishesByRestaurantNameAndCategoryIdSuccessfully() {
+        String restaurantName = "El Corral";
+        Long categoryId = 1L;
+        List<Dish> dishes = List.of(dish);
+        when(dishRepository.findByRestaurantNameAndCategoryId(restaurantName, categoryId)).thenReturn(dishes);
+
+        List<Dish> result = dishUseCase.getAllDishesByRestaurant(restaurantName, categoryId);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Pizza", result.getFirst().getName());
+        verify(dishRepository).findByRestaurantNameAndCategoryId(restaurantName, categoryId);
+        verify(dishRepository, never()).findByRestaurantName(anyString());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRestaurantNameIsNull() {
+        ValidationException ex = assertThrows(
+                ValidationException.class,
+                () -> dishUseCase.getAllDishesByRestaurant(null, 1L)
+        );
+
+        assertEquals(ValidationMessages.INVALID_RESTAURANT_PARAM.getMessage(), ex.getMessage());
+        verify(dishRepository, never()).findByRestaurantName(anyString());
+        verify(dishRepository, never()).findByRestaurantNameAndCategoryId(anyString(), anyLong());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRestaurantNameIsBlank() {
+        ValidationException ex = assertThrows(
+                ValidationException.class,
+                () -> dishUseCase.getAllDishesByRestaurant("   ", 1L)
+        );
+
+        assertEquals(ValidationMessages.INVALID_RESTAURANT_PARAM.getMessage(), ex.getMessage());
+        verify(dishRepository, never()).findByRestaurantName(anyString());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenNoDishesFoundByRestaurantName() {
+        String restaurantName = "NonExistent";
+        when(dishRepository.findByRestaurantName(restaurantName)).thenReturn(List.of());
+
+        DishNotFoundException ex = assertThrows(
+                DishNotFoundException.class,
+                () -> dishUseCase.getAllDishesByRestaurant(restaurantName, null)
+        );
+
+        assertTrue(ex.getMessage().contains(restaurantName));
+        verify(dishRepository).findByRestaurantName(restaurantName);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenNoDishesFoundByRestaurantNameAndCategory() {
+        String restaurantName = "El Corral";
+        Long categoryId = 99L;
+        when(dishRepository.findByRestaurantNameAndCategoryId(restaurantName, categoryId)).thenReturn(List.of());
+
+        DishNotFoundException ex = assertThrows(
+                DishNotFoundException.class,
+                () -> dishUseCase.getAllDishesByRestaurant(restaurantName, categoryId)
+        );
+
+        assertTrue(ex.getMessage().contains(restaurantName));
+        verify(dishRepository).findByRestaurantNameAndCategoryId(restaurantName, categoryId);
     }
 
 
