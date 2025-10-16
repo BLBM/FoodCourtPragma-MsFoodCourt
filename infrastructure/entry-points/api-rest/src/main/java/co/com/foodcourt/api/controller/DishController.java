@@ -11,7 +11,6 @@ import co.com.foodcourt.api.mapper.UpdateDishMapper;
 import co.com.foodcourt.api.service.DishPageableService;
 import co.com.foodcourt.model.plate.Dish;
 import co.com.foodcourt.usecase.dish.DishUseCase;
-import co.com.foodcourt.usecase.exception.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;

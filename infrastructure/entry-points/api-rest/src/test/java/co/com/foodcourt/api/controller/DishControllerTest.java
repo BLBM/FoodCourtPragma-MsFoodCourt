@@ -5,6 +5,7 @@ import co.com.foodcourt.api.dto.CreateDishResponse;
 import co.com.foodcourt.api.dto.UpdateDishRequest;
 import co.com.foodcourt.api.exception.UnauthorizedException;
 import co.com.foodcourt.api.global_exception_handler.GlobalExceptionHandler;
+import co.com.foodcourt.api.service.DishPageableService;
 import co.com.foodcourt.model.plate.Dish;
 import co.com.foodcourt.usecase.dish.DishUseCase;
 import co.com.foodcourt.usecase.exception.ValidationException;
@@ -38,6 +39,9 @@ public class DishControllerTest {
 
     @MockitoBean
     private DishUseCase dishUseCase;
+
+    @MockitoBean
+    private DishPageableService dishPageableService;
 
     private CreateDishRequest createDishRequest;
     private UpdateDishRequest updateDishRequest;
