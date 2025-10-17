@@ -27,7 +27,7 @@ public class CreateRestaurantUseCase {
         return savedRestaurant;
     }
 
-    public List<Restaurant> execute() {
+    public List<Restaurant> getAllRestaurants() {
         return restaurantRepository.findAllOrderedByNameAsc();
     }
 

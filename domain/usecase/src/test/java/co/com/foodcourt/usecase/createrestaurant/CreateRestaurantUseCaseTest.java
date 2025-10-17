@@ -185,7 +185,7 @@ class CreateRestaurantUseCaseTest {
     void shouldReturnRestaurantsOrderedByName() {
         when(restaurantRepository.findAllOrderedByNameAsc()).thenReturn(mockRestaurants);
 
-        List<Restaurant> result = createRestaurantUseCase.execute();
+        List<Restaurant> result = createRestaurantUseCase.getAllRestaurants();
 
         assertEquals(mockRestaurants, result);
         verify(restaurantRepository, times(1)).findAllOrderedByNameAsc();
@@ -196,7 +196,7 @@ class CreateRestaurantUseCaseTest {
     void shouldReturnEmptyListWhenRepositoryReturnsEmpty() {
         when(restaurantRepository.findAllOrderedByNameAsc()).thenReturn(List.of());
 
-        List<Restaurant> result = createRestaurantUseCase.execute();
+        List<Restaurant> result = createRestaurantUseCase.getAllRestaurants();
 
         assertEquals(0, result.size());
         verify(restaurantRepository, times(1)).findAllOrderedByNameAsc();

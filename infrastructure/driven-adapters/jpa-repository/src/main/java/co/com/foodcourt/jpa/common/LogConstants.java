@@ -9,7 +9,9 @@ public enum LogConstants {
     SAVE_DISH("saving Dish : {}"),
     DISH_SAVED("Dish saved successfully with id: {}"),
     FIND_RESTAURANT_BY_ID("Searching restaurant by id: {}"),
-    RESTAURANT_FOUND("Restaurant with id {} found");
+    RESTAURANT_FOUND("Restaurant with id {} found"),
+    SAVE_EMPLOYEE_RESTAURANT("Saving relation employee restaurant: {}"),
+    EMPLOYEE_RESTAURANT_SAVED("Relation employee restaurant saved: {}");
 
 
     private final String message;

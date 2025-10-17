@@ -12,10 +12,10 @@ public interface DishJPARepository extends JpaRepository<DishEntity, Long>{
 
 
     @Query(DishQueries.FIND_BY_RESTAURANT_NAME)
-    List<DishEntity> findByRestaurantName(@Param("restaurantName") String restaurantName);
+    List<DishEntity> findByRestaurantId(@Param("restaurantId") Long restaurantName);
 
     @Query(DishQueries.FIND_BY_RESTAURANT_NAME_AND_CATEGORY_ID)
-    List<DishEntity> findByRestaurantNameAndCategoryId(
-            @Param("restaurantName") String restaurantName,
+    List<DishEntity> findByRestaurantIdAndCategoryId(
+            @Param("restaurantId") Long restaurantName,
             @Param("categoryId") Long categoryId);
 }

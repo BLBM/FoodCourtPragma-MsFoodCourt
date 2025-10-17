@@ -58,16 +58,16 @@ public class DishUseCase {
     }
 
     
-    public List<Dish> getAllDishesByRestaurant(String restaurantName, Long categoryId) {
-        if (restaurantName == null || restaurantName.isBlank()) {
+    public List<Dish> getAllDishesByRestaurant(Long restaurantId, Long categoryId) {
+        if (restaurantId == null) {
             throw new ValidationException(ValidationMessages.INVALID_RESTAURANT_PARAM.getMessage());
         }
         List<Dish> dishes = (categoryId == null)
-                ? dishRepository.findByRestaurantName(restaurantName)
-                : dishRepository.findByRestaurantNameAndCategoryId(restaurantName, categoryId);
+                ? dishRepository.findByRestaurantId(restaurantId)
+                : dishRepository.findByRestaurantNameAndCategoryId(restaurantId, categoryId);
 
         if (dishes.isEmpty()) {
-            throw new DishNotFoundException(ValidationMessages.DISHES_NOT_FOUND_FOR_RESTAURANT.getMessage() + restaurantName);
+            throw new DishNotFoundException(ValidationMessages.DISHES_NOT_FOUND_FOR_RESTAURANT.getMessage() + restaurantId);
         }
         return dishes;
     }

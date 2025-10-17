@@ -12,6 +12,7 @@ import co.com.foodcourt.model.restaurant.Restaurant;
 import co.com.foodcourt.model.user.User;
 import co.com.foodcourt.model.user.exception.ExternalServiceException;
 import co.com.foodcourt.usecase.createrestaurant.CreateRestaurantUseCase;
+import co.com.foodcourt.usecase.employee_restaurant.EmployeeRestaurantUseCase;
 import co.com.foodcourt.usecase.exception.ValidationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +46,9 @@ public class RestaurantControllerTest {
 
     @MockitoBean
     private RestaurantPageableService restaurantPageableService;
+
+    @MockitoBean
+    private EmployeeRestaurantUseCase employeeRestaurantUseCase;
 
     private PageResponse<GetAllRestaurantsData> mockResponse;
 

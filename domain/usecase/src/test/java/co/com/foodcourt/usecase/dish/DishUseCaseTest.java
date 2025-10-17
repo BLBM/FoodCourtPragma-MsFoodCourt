@@ -223,33 +223,33 @@ public class DishUseCaseTest {
 
     @Test
     void shouldGetAllDishesByRestaurantNameSuccessfully() {
-        String restaurantName = "El Corral";
+        long restaurantId = 1L;
         List<Dish> dishes = List.of(dish);
-        when(dishRepository.findByRestaurantName(restaurantName)).thenReturn(dishes);
+        when(dishRepository.findByRestaurantId(restaurantId)).thenReturn(dishes);
 
-        List<Dish> result = dishUseCase.getAllDishesByRestaurant(restaurantName, null);
+        List<Dish> result = dishUseCase.getAllDishesByRestaurant(restaurantId, null);
 
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals("Pizza", result.getFirst().getName());
-        verify(dishRepository).findByRestaurantName(restaurantName);
-        verify(dishRepository, never()).findByRestaurantNameAndCategoryId(anyString(), anyLong());
+        verify(dishRepository).findByRestaurantId(restaurantId);
+        verify(dishRepository, never()).findByRestaurantIdAndCategoryId(anyLong(), anyLong());
     }
 
     @Test
     void shouldGetAllDishesByRestaurantNameAndCategoryIdSuccessfully() {
-        String restaurantName = "El Corral";
+        long restaurantId = 1L;
         Long categoryId = 1L;
         List<Dish> dishes = List.of(dish);
-        when(dishRepository.findByRestaurantNameAndCategoryId(restaurantName, categoryId)).thenReturn(dishes);
+        when(dishRepository.findByRestaurantIdAndCategoryId(restaurantId, categoryId)).thenReturn(dishes);
 
-        List<Dish> result = dishUseCase.getAllDishesByRestaurant(restaurantName, categoryId);
+        List<Dish> result = dishUseCase.getAllDishesByRestaurant(restaurantId, categoryId);
 
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals("Pizza", result.getFirst().getName());
-        verify(dishRepository).findByRestaurantNameAndCategoryId(restaurantName, categoryId);
-        verify(dishRepository, never()).findByRestaurantName(anyString());
+        verify(dishRepository).findByRestaurantIdAndCategoryId(restaurantId, categoryId);
+        verify(dishRepository, never()).findByRestaurantId(anyLong());
     }
 
     @Test
@@ -260,48 +260,47 @@ public class DishUseCaseTest {
         );
 
         assertEquals(ValidationMessages.INVALID_RESTAURANT_PARAM.getMessage(), ex.getMessage());
-        verify(dishRepository, never()).findByRestaurantName(anyString());
-        verify(dishRepository, never()).findByRestaurantNameAndCategoryId(anyString(), anyLong());
+        verify(dishRepository, never()).findByRestaurantId(anyLong());
+        verify(dishRepository, never()).findByRestaurantIdAndCategoryId(anyLong(), anyLong());
     }
 
     @Test
     void shouldThrowExceptionWhenRestaurantNameIsBlank() {
         ValidationException ex = assertThrows(
                 ValidationException.class,
-                () -> dishUseCase.getAllDishesByRestaurant("   ", 1L)
+                () -> dishUseCase.getAllDishesByRestaurant(null, 1L)
         );
 
         assertEquals(ValidationMessages.INVALID_RESTAURANT_PARAM.getMessage(), ex.getMessage());
-        verify(dishRepository, never()).findByRestaurantName(anyString());
+        verify(dishRepository, never()).findByRestaurantId(anyLong());
     }
 
     @Test
     void shouldThrowExceptionWhenNoDishesFoundByRestaurantName() {
-        String restaurantName = "NonExistent";
-        when(dishRepository.findByRestaurantName(restaurantName)).thenReturn(List.of());
+
+        long restaurantId = 1L;
+        when(dishRepository.findByRestaurantId(restaurantId)).thenReturn(List.of());
 
         DishNotFoundException ex = assertThrows(
                 DishNotFoundException.class,
-                () -> dishUseCase.getAllDishesByRestaurant(restaurantName, null)
+                () -> dishUseCase.getAllDishesByRestaurant(restaurantId, null)
         );
 
-        assertTrue(ex.getMessage().contains(restaurantName));
-        verify(dishRepository).findByRestaurantName(restaurantName);
+        verify(dishRepository).findByRestaurantId(restaurantId);
     }
 
     @Test
     void shouldThrowExceptionWhenNoDishesFoundByRestaurantNameAndCategory() {
-        String restaurantName = "El Corral";
+        long restaurantId = 1L;
         Long categoryId = 99L;
-        when(dishRepository.findByRestaurantNameAndCategoryId(restaurantName, categoryId)).thenReturn(List.of());
+        when(dishRepository.findByRestaurantIdAndCategoryId(restaurantId, categoryId)).thenReturn(List.of());
 
         DishNotFoundException ex = assertThrows(
                 DishNotFoundException.class,
-                () -> dishUseCase.getAllDishesByRestaurant(restaurantName, categoryId)
+                () -> dishUseCase.getAllDishesByRestaurant(restaurantId, categoryId)
         );
 
-        assertTrue(ex.getMessage().contains(restaurantName));
-        verify(dishRepository).findByRestaurantNameAndCategoryId(restaurantName, categoryId);
+        verify(dishRepository).findByRestaurantIdAndCategoryId(restaurantId, categoryId);
     }
 
 

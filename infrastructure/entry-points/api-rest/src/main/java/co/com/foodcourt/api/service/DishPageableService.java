@@ -16,8 +16,8 @@ public class DishPageableService {
     private final DishUseCase dishUseCase;
     private final PageableService pageableService;
 
-    public PageResponse<GetAllDishesData> getDishes(String restaurantName, Long categoryId, int page, int size) {
-        List<Dish> dishes = dishUseCase.getAllDishesByRestaurant(restaurantName, categoryId);
+    public PageResponse<GetAllDishesData> getDishes(Long restaurantId, Long categoryId, int page, int size) {
+        List<Dish> dishes = dishUseCase.getAllDishesByRestaurant(restaurantId, categoryId);
 
         return pageableService.paginate(
                 dishes,

@@ -127,27 +127,31 @@ class DishJPARepositoryAdapterTest {
 
     @Test
     void shouldFindDishesByRestaurantNameSuccessfully() {
+        long restaurantId = 1L;
+
         List<DishEntity> dishEntities = List.of(dishEntity);
-        when(repository.findByRestaurantName("El Corral")).thenReturn(dishEntities);
+        when(repository.findByRestaurantId(restaurantId)).thenReturn(dishEntities);
         when(mapper.map(dishEntity, Dish.class)).thenReturn(dish);
         when(mapper.map(dishEntity.getCategoryId(), Category.class)).thenReturn(dish.getCategory());
         when(mapper.map(dishEntity.getRestaurantId(), Restaurant.class)).thenReturn(dish.getRestaurant());
 
-        List<Dish> result = adapter.findByRestaurantName("El Corral");
+        List<Dish> result = adapter.findByRestaurantId(restaurantId);
 
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals("Cheeseburger", result.getFirst().getName());
         assertNotNull(result.getFirst().getCategory());
         assertNotNull(result.getFirst().getRestaurant());
-        verify(repository).findByRestaurantName("El Corral");
+        verify(repository).findByRestaurantId(restaurantId);
     }
 
     @Test
     void shouldReturnEmptyListWhenNoDishesByRestaurantName() {
-        when(repository.findByRestaurantName("NonExistent")).thenReturn(List.of());
+        long restaurantId = 1L;
 
-        List<Dish> result = adapter.findByRestaurantName("NonExistent");
+        when(repository.findByRestaurantId(restaurantId)).thenReturn(List.of());
+
+        List<Dish> result = adapter.findByRestaurantId(restaurantId);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -155,26 +159,30 @@ class DishJPARepositoryAdapterTest {
 
     @Test
     void shouldFindDishesByRestaurantNameAndCategoryIdSuccessfully() {
+        long restaurantId = 1L;
+
         List<DishEntity> dishEntities = List.of(dishEntity);
-        when(repository.findByRestaurantNameAndCategoryId("El Corral", 2L)).thenReturn(dishEntities);
+        when(repository.findByRestaurantIdAndCategoryId(restaurantId, 2L)).thenReturn(dishEntities);
         when(mapper.map(dishEntity, Dish.class)).thenReturn(dish);
         when(mapper.map(dishEntity.getCategoryId(), Category.class)).thenReturn(dish.getCategory());
         when(mapper.map(dishEntity.getRestaurantId(), Restaurant.class)).thenReturn(dish.getRestaurant());
 
-        List<Dish> result = adapter.findByRestaurantNameAndCategoryId("El Corral", 2L);
+        List<Dish> result = adapter.findByRestaurantIdAndCategoryId(restaurantId, 2L);
 
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals("Cheeseburger", result.getFirst().getName());
         assertEquals(2L, result.getFirst().getCategory().getCategoryId());
-        verify(repository).findByRestaurantNameAndCategoryId("El Corral", 2L);
+        verify(repository).findByRestaurantIdAndCategoryId(restaurantId, 2L);
     }
 
     @Test
     void shouldReturnEmptyListWhenNoDishesByRestaurantNameAndCategoryId() {
-        when(repository.findByRestaurantNameAndCategoryId("El Corral", 99L)).thenReturn(List.of());
+        long restaurantId = 1L;
 
-        List<Dish> result = adapter.findByRestaurantNameAndCategoryId("El Corral", 99L);
+        when(repository.findByRestaurantIdAndCategoryId(restaurantId, 99L)).thenReturn(List.of());
+
+        List<Dish> result = adapter.findByRestaurantIdAndCategoryId(restaurantId, 99L);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());

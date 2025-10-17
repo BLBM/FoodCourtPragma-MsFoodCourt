@@ -9,6 +9,7 @@ import co.com.foodcourt.api.mapper.SaveRestaurantMapper;
 import co.com.foodcourt.api.service.RestaurantPageableService;
 import co.com.foodcourt.model.restaurant.Restaurant;
 import co.com.foodcourt.usecase.createrestaurant.CreateRestaurantUseCase;
+import co.com.foodcourt.usecase.employee_restaurant.EmployeeRestaurantUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -34,6 +35,8 @@ public class RestaurantController {
 
     private final CreateRestaurantUseCase createRestaurantUseCase;
     private final RestaurantPageableService restaurantPageableService;
+    private final EmployeeRestaurantUseCase employeeRestaurantUseCase;
+
 
     @Operation(
             summary = SwaggerConstants.CREATE_RESTAURANT_SUMMARY,
@@ -101,4 +104,26 @@ public class RestaurantController {
         log.info(LogConstants.GET_ALL_RESTAURANT_REQUEST.getMessage());
         return ResponseEntity.ok(restaurantPageableService.getRestaurants(page, size));
     }
+
+    @PostMapping("/{restaurantId}/employees")
+    public ResponseEntity<MessageResponse> assignEmployeeToRestaurant(
+            @RequestHeader(name = "X-User-id") Long ownerId,
+            @RequestHeader(name = "X-User-role") String role,
+            @PathVariable(name = "restaurantId") Long restaurantId,
+            @Valid @RequestBody AssignEmployeeRequest request
+    ){
+        if (!Rol.OWNER.name().equalsIgnoreCase(role)) {
+            throw new UnauthorizedException(ErrorMessages.INVALID_ROL_ASSIGN_EMPLOYEE.getMessage());
+        }
+
+        log.info(LogConstants.ASSIGN_EMPLOYEE_REQUEST.getMessage(),request.employeeId());
+        employeeRestaurantUseCase.assign(request.employeeId(),restaurantId,ownerId);
+        log.info(LogConstants.ASSIGN_EMPLOYEE_SUCCESS.getMessage(),request.employeeId());
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new MessageResponse(LogConstants.ASSIGN_EMPLOYEE_SUCCESS.getMessage()));
+    }
+
+
+
 }

@@ -42,7 +42,7 @@ class RestaurantPageableServiceTest {
                 Restaurant.builder().name("El Corral").urlLogo("corral.png").build(),
                 Restaurant.builder().name("Frisby").urlLogo("frisby.png").build()
         );
-        when(createRestaurantUseCase.execute()).thenReturn(mockRestaurants);
+        when(createRestaurantUseCase.getAllRestaurants()).thenReturn(mockRestaurants);
 
         PageResponse<GetAllRestaurantsData> result = restaurantPageableService.getRestaurants(1, 3);
 

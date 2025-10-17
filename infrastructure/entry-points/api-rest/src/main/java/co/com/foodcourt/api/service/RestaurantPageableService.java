@@ -19,7 +19,7 @@ public class RestaurantPageableService {
     private final PageableService pageableService;
 
     public PageResponse<GetAllRestaurantsData> getRestaurants(int page, int size) {
-        List<Restaurant> all = createRestaurantUseCase.execute();
+        List<Restaurant> all = createRestaurantUseCase.getAllRestaurants();
 
         return pageableService.paginate(
                 all,

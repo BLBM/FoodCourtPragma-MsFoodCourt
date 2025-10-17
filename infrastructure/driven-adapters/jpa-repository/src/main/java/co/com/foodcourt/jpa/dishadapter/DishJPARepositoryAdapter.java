@@ -59,8 +59,8 @@ public class DishJPARepositoryAdapter   extends AdapterOperations<Dish, DishEnti
     }
 
     @Override
-    public List<Dish> findByRestaurantName(String restaurantName) {
-        return repository.findByRestaurantName(restaurantName)
+    public List<Dish> findByRestaurantId(Long restaurantName) {
+        return repository.findByRestaurantId(restaurantName)
                 .stream()
                 .map(entity -> {
                     Dish dish = super.mapper.map(entity, Dish.class);
@@ -77,8 +77,8 @@ public class DishJPARepositoryAdapter   extends AdapterOperations<Dish, DishEnti
     }
 
     @Override
-    public List<Dish> findByRestaurantNameAndCategoryId(String restaurantName, Long categoryId) {
-        return repository.findByRestaurantNameAndCategoryId(restaurantName, categoryId)
+    public List<Dish> findByRestaurantIdAndCategoryId(Long restaurantId, Long categoryId) {
+        return repository.findByRestaurantIdAndCategoryId(restaurantId, categoryId)
                 .stream()
                 .map(entity -> {
                     Dish dish = super.mapper.map(entity, Dish.class);

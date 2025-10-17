@@ -9,8 +9,8 @@ public interface DishRepository {
 
     Dish findById(Long dishId);
 
-    List<Dish> findByRestaurantName(String restaurantName);
+    List<Dish> findByRestaurantId(Long restaurantId);
 
-    List<Dish> findByRestaurantNameAndCategoryId(String restaurantName, Long CategoryId);
+    List<Dish> findByRestaurantIdAndCategoryId(Long restaurantId, Long CategoryId);
 
 }

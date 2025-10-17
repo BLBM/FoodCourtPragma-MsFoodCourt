@@ -142,7 +142,7 @@ public class DishController {
     @GetMapping
     public ResponseEntity<PageResponse<GetAllDishesData>> listDishes(
             @RequestHeader(name = "X-User-role") String role,
-            @RequestParam(name = "restaurantName") String restaurantName,
+            @RequestParam(name = "restaurantId") Long restaurantId,
             @RequestParam(name = "categoryId", required = false) Long categoryId,
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size) {
@@ -153,7 +153,7 @@ public class DishController {
 
         log.info(LogConstants.GET_ALL_DISHES_REQUEST.getMessage());
         PageResponse<GetAllDishesData> response =
-                dishPageableService.getDishes(restaurantName, categoryId, page, size);
+                dishPageableService.getDishes(restaurantId, categoryId, page, size);
         log.info(LogConstants.GET_ALL_DISHES_SUCCESS.getMessage());
         return ResponseEntity.ok(response);
     }

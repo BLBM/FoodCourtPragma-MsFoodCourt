@@ -8,7 +8,7 @@ public enum ErrorMessages {
     INVALID_ROL_OWNER_UPDATE_DISHES("Only owners can update dishes"),
     INVALID_RESTAURANT_ROL("Only admin can create restaurants"),
     INVALID_ROL_SHOW_RESTAURANTS("Only clients can to see the restaurants please register"),
-    RESTAURANT_NAME_REQUIRED("Restaurant name must be provided");
+    INVALID_ROL_ASSIGN_EMPLOYEE("Only owners can assign employees");
 
     private final String message;
 
