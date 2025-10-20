@@ -7,6 +7,7 @@ import co.com.foodcourt.api.common.SwaggerConstants;
 import co.com.foodcourt.api.dto.*;
 import co.com.foodcourt.api.exception.UnauthorizedException;
 import co.com.foodcourt.api.mapper.SaveOrderMapper;
+import co.com.foodcourt.api.service.OrderPageableService;
 import co.com.foodcourt.model.order.Order;
 import co.com.foodcourt.usecase.order.OrderUseCase;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
 
     private final OrderUseCase orderUseCase;
+    private final OrderPageableService orderPageableService;
 
 
     @Operation(
@@ -84,6 +86,23 @@ public class OrderController {
         log.info(LogConstants.CREATE_ORDER_REQUEST.getMessage(), response.orderId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+
+    @GetMapping
+    public ResponseEntity<PageResponse<GetAllOrdersData>> listOrdersByStatus(
+            @RequestHeader(name = "X-User-role") String role,
+            @RequestHeader(name = "X-User-id") Long employeeId,
+            @RequestParam(name = "status") String status,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "3") int size) {
+
+        if (!Rol.EMPLOYEE.name().equalsIgnoreCase(role)) {
+            throw new UnauthorizedException(ErrorMessages.INVALID_ROL_SHOW_ORDERS.getMessage());
+        }
+
+        log.info(LogConstants.GET_ALL_ORDERS_REQUEST.getMessage());
+        return ResponseEntity.ok(orderPageableService.getOrders(employeeId, status, page, size));
     }
 
 }

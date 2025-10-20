@@ -8,4 +8,5 @@ import java.util.List;
 public interface OrderRepository {
     Order saveOrder(Order order);
     boolean existsByClientIdAndStatusIn(Long clientId, List<OrderStatus> statuses);
+    List<Order> findByRestaurantAndStatus(Long restaurantId, String status);
 }

@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -41,7 +42,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleValidationException(ValidationException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put(LogConstants.TIMESTAMP.getMessage(), LocalDateTime.now());
-        body.put(LogConstants.ERROR.getMessage(), "");
+        body.put(LogConstants.ERROR.getMessage(), ErrorMessages.BUSINESS_VALIDATION_ERROR.getMessage());
         body.put(LogConstants.DETAILS.getMessage(), ex.getMessage());
         return ResponseEntity.badRequest().body(body);
     }
@@ -88,5 +89,15 @@ public class GlobalExceptionHandler {
         body.put(LogConstants.ERROR.getMessage(),  ErrorMessages.BUSINESS_VALIDATION_ERROR.getMessage());
         body.put(LogConstants.DETAILS.getMessage(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingRequestHeaderException(MissingRequestHeaderException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put(LogConstants.TIMESTAMP.getMessage(), LocalDateTime.now());
+        body.put(LogConstants.ERROR.getMessage(), ErrorMessages.BUSINESS_VALIDATION_ERROR.getMessage());
+        body.put(LogConstants.DETAILS.getMessage(),ErrorMessages.INVALID_REQUEST_HEADER.getMessage() + ex.getHeaderName());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 }

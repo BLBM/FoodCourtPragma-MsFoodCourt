@@ -1,5 +1,6 @@
 package co.com.foodcourt.config;
 
+import co.com.foodcourt.model.employee_restaurant.gateways.EmployeeRestaurantRepository;
 import co.com.foodcourt.model.order.gateways.OrderRepository;
 import co.com.foodcourt.model.plate.gateways.DishRepository;
 import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
@@ -31,8 +32,11 @@ public class UseCasesConfig {
     }
 
     @Bean
-    public OrderUseCase orderUseCase(OrderRepository orderRepository,RestaurantRepository restaurantRepository,DishRepository dishRepository){
-        return new OrderUseCase(orderRepository,restaurantRepository,dishRepository);
+    public OrderUseCase orderUseCase(OrderRepository orderRepository,
+                                     RestaurantRepository restaurantRepository,
+                                     DishRepository dishRepository,
+                                     EmployeeRestaurantRepository employeeRestaurantRepository){
+        return new OrderUseCase(orderRepository,restaurantRepository,dishRepository,employeeRestaurantRepository);
     }
 
 }

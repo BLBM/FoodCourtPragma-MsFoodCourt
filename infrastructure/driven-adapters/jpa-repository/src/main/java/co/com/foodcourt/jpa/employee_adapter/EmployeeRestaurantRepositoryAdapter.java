@@ -38,6 +38,11 @@ public class EmployeeRestaurantRepositoryAdapter extends AdapterOperations
         log.info(LogConstants.EMPLOYEE_RESTAURANT_SAVED.getMessage(),employeeRestaurantSaved.getId());
     }
 
+    @Override
+    public Long findRestaurantIdByEmployeeId(Long employeeId) {
+        return repository.findRestaurantIdByEmployeeId(employeeId);
+    }
+
 }
 
 

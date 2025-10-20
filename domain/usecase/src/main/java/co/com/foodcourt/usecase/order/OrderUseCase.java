@@ -7,9 +7,12 @@ import co.com.foodcourt.model.order.gateways.OrderRepository;
 import co.com.foodcourt.model.plate.gateways.DishRepository;
 import co.com.foodcourt.model.restaurant.Restaurant;
 import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
+import co.com.foodcourt.usecase.common.ValidationMessages;
+import co.com.foodcourt.usecase.exception.ValidationException;
 import co.com.foodcourt.usecase.util.ValidateOrder;
 import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class OrderUseCase {
@@ -41,5 +44,16 @@ public class OrderUseCase {
                 .build();
 
         return orderRepository.saveOrder(order);
+    }
+
+    public List<Order> getAllOrderByStatus(Long employeeId, String status) {
+
+        Long restaurantId = employeeRestaurantRepository.findRestaurantIdByEmployeeId(employeeId);
+
+        if (restaurantId == null) {
+            throw new ValidationException(ValidationMessages.INVALID_EMPLOYEE_NOT_BELONG.getMessage());
+        }
+
+        return orderRepository.findByRestaurantAndStatus(restaurantId, status);
     }
 }

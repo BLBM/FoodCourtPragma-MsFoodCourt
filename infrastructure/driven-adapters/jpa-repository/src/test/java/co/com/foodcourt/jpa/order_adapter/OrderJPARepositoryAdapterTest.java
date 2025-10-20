@@ -114,5 +114,55 @@ class OrderJPARepositoryAdapterTest {
         verify(mapper).toEntityStatusList(statuses);
         verify(repository).existsByClientIdAndStatusIn(100L, statusEntities);
     }
+
+    /* Feature hu 12*/
+
+
+    @Test
+    void shouldFindOrdersByRestaurantAndStatusSuccessfully() {
+        Long restaurantId = 9L;
+        String status = "pending";
+        List<OrderEntity> entities = List.of(orderEntity);
+
+        when(repository.findOrdersByRestaurantAndStatusWithDetails(restaurantId, OrderStatusEntity.PENDING))
+                .thenReturn(entities);
+        when(mapper.toDomain(orderEntity)).thenReturn(order);
+
+        List<Order> result = adapter.findByRestaurantAndStatus(restaurantId, status);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(1L, result.getFirst().getOrderId());
+        assertEquals(OrderStatus.PENDING, result.getFirst().getStatus());
+
+        verify(repository, times(1))
+                .findOrdersByRestaurantAndStatusWithDetails(restaurantId, OrderStatusEntity.PENDING);
+        verify(mapper, times(1)).toDomain(orderEntity);
+    }
+
+    @Test
+    void shouldReturnEmptyList_WhenRepositoryReturnsNoOrders() {
+        when(repository.findOrdersByRestaurantAndStatusWithDetails(1L, OrderStatusEntity.DELIVERED))
+                .thenReturn(List.of());
+
+        List<Order> result = adapter.findByRestaurantAndStatus(1L, "DELIVERED");
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(repository, times(1))
+                .findOrdersByRestaurantAndStatusWithDetails(1L, OrderStatusEntity.DELIVERED);
+        verifyNoInteractions(mapper);
+    }
+
+    @Test
+    void shouldThrowException_WhenInvalidStatusProvided() {
+        String invalidStatus = "INVALID_STATUS";
+
+        assertThrows(IllegalArgumentException.class, () ->
+                adapter.findByRestaurantAndStatus(1L, invalidStatus));
+
+        verifyNoInteractions(repository);
+        verifyNoInteractions(mapper);
+    }
 }
 

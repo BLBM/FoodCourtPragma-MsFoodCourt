@@ -10,6 +10,8 @@ public enum ErrorMessages {
     INVALID_ROL_SHOW_RESTAURANTS("Only clients can to see the restaurants please register"),
     INVALID_ROL_ASSIGN_EMPLOYEE("Only owners can assign employees"),
     INVALID_ROLE_CREATE_ORDER("Only clients can create orders"),
+    INVALID_ROL_SHOW_ORDERS("Only employees can show orders"),
+    INVALID_REQUEST_HEADER("The required header, was not sent in the application: "),
     BUSINESS_VALIDATION_ERROR("Business validation error"),
     UNEXPECTED_ERROR("Unexpected error");
 

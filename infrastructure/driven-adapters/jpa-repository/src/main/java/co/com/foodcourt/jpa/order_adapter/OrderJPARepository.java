@@ -14,4 +14,10 @@ public interface OrderJPARepository extends JpaRepository <OrderEntity,Long>{
             @Param("clientId") Long clientId,
             @Param("statuses") List<OrderStatusEntity> statuses
     );
+
+    @Query(OrderQuerys.FIND_ORDERS_BY_RESTAURANT_AND_STATUS)
+    List<OrderEntity> findOrdersByRestaurantAndStatusWithDetails(
+            @Param("restaurantId") Long restaurantId,
+            @Param("status") OrderStatusEntity  status
+    );
 }

@@ -11,4 +11,14 @@ public final class OrderQuerys {
             WHERE o.clientId = :clientId
               AND o.status IN :statuses
             """;
+
+    public static final String FIND_ORDERS_BY_RESTAURANT_AND_STATUS =
+            """
+            SELECT o FROM OrderEntity o
+            JOIN FETCH o.orderDishes od
+            JOIN FETCH od.dish d
+            WHERE o.restaurant.restaurantId = :restaurantId
+              AND o.status = :status
+            ORDER BY o.creationDate DESC
+            """;
 }

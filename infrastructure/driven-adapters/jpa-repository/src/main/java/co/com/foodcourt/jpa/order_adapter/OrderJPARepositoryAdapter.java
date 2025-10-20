@@ -3,6 +3,7 @@ package co.com.foodcourt.jpa.order_adapter;
 
 import co.com.foodcourt.jpa.common.LogConstants;
 import co.com.foodcourt.jpa.entity.OrderEntity;
+import co.com.foodcourt.jpa.entity.OrderStatusEntity;
 import co.com.foodcourt.jpa.mapper.OrderEntityMapper;
 import co.com.foodcourt.model.order.Order;
 import co.com.foodcourt.model.order.OrderStatus;
@@ -47,5 +48,13 @@ public class OrderJPARepositoryAdapter implements OrderRepository {
                 clientId,
                 mapper.toEntityStatusList(statuses)
         );
+    }
+
+    @Override
+    public List<Order> findByRestaurantAndStatus(Long restaurantId, String status) {
+        OrderStatusEntity statusEntity = OrderStatusEntity.valueOf(status.toUpperCase());
+        List<OrderEntity> entities = repository
+                .findOrdersByRestaurantAndStatusWithDetails(restaurantId, statusEntity);
+        return entities.stream().map(mapper::toDomain).toList();
     }
 }
