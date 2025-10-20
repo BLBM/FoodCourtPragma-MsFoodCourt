@@ -13,6 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,6 +34,7 @@ class CreateRestaurantUseCaseTest {
 
     private Restaurant restaurant;
     private User user;
+    private List<Restaurant> mockRestaurants;
 
     @BeforeEach
     void setUp(){
@@ -54,6 +57,10 @@ class CreateRestaurantUseCaseTest {
                 .nit(900888777L)
                 .build();
 
+        mockRestaurants = List.of(
+                Restaurant.builder().restaurantId(1L).name("El Corral").urlLogo("corral.png").build(),
+                Restaurant.builder().restaurantId(2L).name("Frisby").urlLogo("frisby.png").build()
+        );
     }
 
     @Test
@@ -172,7 +179,28 @@ class CreateRestaurantUseCaseTest {
         verify(restaurantRepository, never()).saveRestaurant(any());
     }
 
+    /// //////////////// FEATURE HU9//////////////////
 
+    @Test
+    void shouldReturnRestaurantsOrderedByName() {
+        when(restaurantRepository.findAllOrderedByNameAsc()).thenReturn(mockRestaurants);
+
+        List<Restaurant> result = createRestaurantUseCase.getAllRestaurants();
+
+        assertEquals(mockRestaurants, result);
+        verify(restaurantRepository, times(1)).findAllOrderedByNameAsc();
+        verifyNoMoreInteractions(restaurantRepository);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenRepositoryReturnsEmpty() {
+        when(restaurantRepository.findAllOrderedByNameAsc()).thenReturn(List.of());
+
+        List<Restaurant> result = createRestaurantUseCase.getAllRestaurants();
+
+        assertEquals(0, result.size());
+        verify(restaurantRepository, times(1)).findAllOrderedByNameAsc();
+    }
 
 
 

@@ -7,6 +7,18 @@ public enum LogConstants {
 
     CREATE_RESTAURANT_REQUEST("Request to create restaurant: {}"),
     CREATE_RESTAURANT_SUCCESS("restaurant created successfully with name: {}"),
+    GET_ALL_RESTAURANT_REQUEST("Get all restaurants request received"),
+    CREATE_DISH_REQUEST("Request to create dish: {}"),
+    CREATE_DISH_SUCCESS("Dish created successfully with name: {}"),
+    UPDATE_DISH_REQUEST("Request to update dish with id: {}"),
+    UPDATE_DISH_SUCCESS("Dish updated successfully with id: {}"),
+    GET_ALL_DISHES_REQUEST("Get all dishes request received"),
+    GET_ALL_DISHES_SUCCESS("Get all dishes successfully"),
+    ASSIGN_EMPLOYEE_REQUEST("Request for assign employee with id {} received"),
+    ASSIGN_EMPLOYEE_SUCCESS("Employee assign successfully"),
+    CREATE_ORDER_REQUEST("Request to create order for client {} at restaurant {}"),
+    CREATE_ORDER_SUCCESS("Order created successfully with ID {}"),
+    GET_ALL_ORDERS_REQUEST("Get all orders request received"),
     TIMESTAMP("timestamp:"),
     ERROR("error:"),
     DETAILS("details:");

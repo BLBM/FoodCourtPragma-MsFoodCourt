@@ -1,13 +1,19 @@
 package co.com.foodcourt.jpa.restaurantadapter;
 
+import co.com.foodcourt.jpa.common.ErrorConstants;
 import co.com.foodcourt.jpa.common.LogConstants;
 import co.com.foodcourt.jpa.entity.RestaurantEntity;
 import co.com.foodcourt.jpa.helper.AdapterOperations;
 import co.com.foodcourt.model.restaurant.Restaurant;
+import co.com.foodcourt.model.restaurant.exception.RestaurantNotFoundException;
 import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
+import co.com.foodcourt.model.user.User;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -30,5 +36,27 @@ implements RestaurantRepository
         log.info(LogConstants.RESTAURANT_SAVED.getMessage(),restaurantEntity.getRestaurantId());
 
         return toEntity(restaurantSaved);
+    }
+
+    @Override
+    public Restaurant getRestaurantById(Long restaurantId) {
+
+        log.info(LogConstants.FIND_RESTAURANT_BY_ID.getMessage(),restaurantId);
+        RestaurantEntity restaurantFound = repository.findById(restaurantId)
+                .orElseThrow(()-> new RestaurantNotFoundException(ErrorConstants.RESTAURANT_NOT_FOUND.getMessage(),restaurantId));
+
+        log.info(LogConstants.RESTAURANT_FOUND.getMessage(),restaurantFound.getRestaurantId());
+        Restaurant restaurant = toEntity(restaurantFound);
+        restaurant.setOwner(User.builder().userId(restaurantFound.getOwnerId()).build());
+
+        return restaurant;
+    }
+
+    @Override
+    public List<Restaurant> findAllOrderedByNameAsc() {
+        return repository.findAllByOrderByNameAsc()
+                .stream()
+                .map(entity -> super.mapper.map(entity, Restaurant.class))
+                .toList();
     }
 }

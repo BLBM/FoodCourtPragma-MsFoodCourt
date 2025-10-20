@@ -7,6 +7,9 @@ import co.com.foodcourt.model.user.gateways.UserRepository;
 import co.com.foodcourt.usecase.util.ValidateRestaurant;
 import co.com.foodcourt.usecase.util.ValidateUser;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 @RequiredArgsConstructor
 public class CreateRestaurantUseCase {
 
@@ -23,4 +26,10 @@ public class CreateRestaurantUseCase {
         savedRestaurant.setOwner(owner);
         return savedRestaurant;
     }
+
+    public List<Restaurant> getAllRestaurants() {
+        return restaurantRepository.findAllOrderedByNameAsc();
+    }
+
+
 }

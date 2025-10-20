@@ -1,16 +1,16 @@
 package co.com.foodcourt.jpa.restaurantadapter;
 
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
 import java.util.List;
 import java.util.Optional;
 
 import co.com.foodcourt.jpa.entity.RestaurantEntity;
 import co.com.foodcourt.model.restaurant.Restaurant;
+import co.com.foodcourt.model.restaurant.exception.RestaurantNotFoundException;
 import co.com.foodcourt.model.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,12 @@ class JPARepositoryAdapterTest {
 
     private Restaurant restaurant;
     private RestaurantEntity restaurantEntity;
+    private Restaurant restaurant1;
+    private RestaurantEntity restaurantEntity1;
     private User owner;
+
+    private List<RestaurantEntity> mockEntities;
+    private List<Restaurant> mockModels;
 
     @BeforeEach
     void init() {
@@ -48,13 +53,34 @@ class JPARepositoryAdapterTest {
                 .restaurantId(123L)
                 .name("Test Restaurant")
                 .owner(owner)
+                .urlLogo("a.png")
                 .build();
+
+
+        restaurant1 = Restaurant.builder()
+                .restaurantId(2L)
+                .name("restaurant b")
+                .urlLogo("b.png")
+                .build();
+
+        mockModels = List.of(restaurant, restaurant1);
 
         restaurantEntity = RestaurantEntity.builder()
                 .restaurantId(123L)
                 .name("Test Restaurant")
                 .ownerId(1L)
+                .urlLogo("a.png")
                 .build();
+
+        restaurantEntity1 = RestaurantEntity.builder()
+                .restaurantId(2L)
+                .name("restaurant b")
+                .urlLogo("b.png")
+                .build();
+
+        mockEntities = List.of(restaurantEntity, restaurantEntity1);
+
+
     }
 
     @Test
@@ -141,4 +167,68 @@ class JPARepositoryAdapterTest {
 
         assertThrows(NullPointerException.class, () -> adapter.saveRestaurant(restaurantWithoutOwner));
     }
+
+    ////////////// FEATURE HU3 GET RESTAURANT BY ID TESTS ////////////////////
+
+    @Test
+    void getRestaurantById_success(){
+        long restaurantId = 123L;
+
+        when(repository.findById(restaurantId)).thenReturn(Optional.of(restaurantEntity));
+        when(mapper.map(restaurantEntity, Restaurant.class)).thenReturn(restaurant);
+
+        Restaurant restaurantResult = adapter.getRestaurantById(restaurantId);
+
+        assertNotNull(restaurantResult);
+        assertEquals(restaurantId,restaurantResult.getRestaurantId());
+
+        verify(repository,times(1)).findById(restaurantId);
+        verify(mapper,times(1)).map(restaurantEntity, Restaurant.class);
+    }
+
+    @Test
+    void getRestaurantById_WhenRestaurantNotFound(){
+
+        long restaurantId = 999L;
+        when(repository.findById(restaurantId)).thenReturn(Optional.empty());
+
+        RestaurantNotFoundException ex = assertThrows(
+                RestaurantNotFoundException.class,
+                ()->adapter.getRestaurantById(restaurantId)
+        );
+
+        assertTrue(ex.getMessage().contains(String.valueOf(restaurantId)));
+
+        verify(repository,times(1)).findById(restaurantId);
+
+    }
+
+    /// //////////////////// FEATURE HU9///////////////////////////
+
+    @Test
+    void shouldReturnMappedRestaurantsOrderedByName() {
+        when(repository.findAllByOrderByNameAsc()).thenReturn(mockEntities);
+        when(mapper.map(mockEntities.get(0), Restaurant.class)).thenReturn(mockModels.get(0));
+        when(mapper.map(mockEntities.get(1), Restaurant.class)).thenReturn(mockModels.get(1));
+
+        List<Restaurant> result = adapter.findAllOrderedByNameAsc();
+
+        assertEquals(2, result.size());
+        assertEquals("Test Restaurant", result.get(0).getName());
+        assertEquals("restaurant b", result.get(1).getName());
+        verify(repository, times(1)).findAllByOrderByNameAsc();
+        verify(mapper, times(2)).map(any(RestaurantEntity.class), eq(Restaurant.class));
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoRestaurantsExist() {
+        when(repository.findAllByOrderByNameAsc()).thenReturn(List.of());
+
+        List<Restaurant> result = adapter.findAllOrderedByNameAsc();
+
+        assertEquals(0, result.size());
+        verify(repository, times(1)).findAllByOrderByNameAsc();
+        verifyNoInteractions(mapper);
+    }
+
 }

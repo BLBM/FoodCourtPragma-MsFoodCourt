@@ -16,19 +16,19 @@ public class ValidateRestaurant {
 
 
 
-    public static void validatePhone(String phone) {
+    private static void validatePhone(String phone) {
         if (phone == null || !PHONE_PATTERN.matcher(phone).matches()) {
             throw new ValidationException(ValidationMessages.INVALID_PHONE.getMessage());
         }
     }
 
-    public static void validateNit(Long nit) {
+    private static void validateNit(Long nit) {
         if (nit == null || !NIT_PATTERN.matcher(nit.toString()).matches()) {
             throw new ValidationException(ValidationMessages.INVALID_NIT.getMessage());
         }
     }
 
-    public static void validateName(String name) {
+    private static void validateName(String name) {
         if (name == null || !NAME_PATTERN.matcher(name).matches()) {
             throw new ValidationException(ValidationMessages.INVALID_RESTAURANT_NAME.getMessage());
         }

@@ -1,0 +1,23 @@
+package co.com.foodcourt.jpa.order_adapter;
+
+import co.com.foodcourt.jpa.entity.OrderEntity;
+import co.com.foodcourt.jpa.entity.OrderStatusEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+
+public interface OrderJPARepository extends JpaRepository <OrderEntity,Long>{
+    @Query(OrderQuerys.EXISTS_BY_CLIENT_ID_AND_STATUS_IN)
+    boolean existsByClientIdAndStatusIn(
+            @Param("clientId") Long clientId,
+            @Param("statuses") List<OrderStatusEntity> statuses
+    );
+
+    @Query(OrderQuerys.FIND_ORDERS_BY_RESTAURANT_AND_STATUS)
+    List<OrderEntity> findOrdersByRestaurantAndStatusWithDetails(
+            @Param("restaurantId") Long restaurantId,
+            @Param("status") OrderStatusEntity  status
+    );
+}
