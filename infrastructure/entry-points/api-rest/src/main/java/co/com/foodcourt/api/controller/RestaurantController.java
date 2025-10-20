@@ -74,10 +74,6 @@ public class RestaurantController {
                     )
             }
     )
-    @Parameters({
-            @Parameter(name = "X-User-id", description = SwaggerConstants.USER_ROLE_DESCRIPTION, example = "1", required = true),
-            @Parameter(name = "X-User-role", description = SwaggerConstants.USER_ROLE_DESCRIPTION, example = "OWNER", required = true)
-    })
     @PostMapping
     public ResponseEntity<CreateRestaurantResponse> createRestaurant(@RequestHeader("X-User-role") String role,
                                                                      @Valid @RequestBody CreateRestaurantRequest restaurantRequest) {
@@ -92,6 +88,32 @@ public class RestaurantController {
 
     }
 
+    @Operation(
+            summary = SwaggerConstants.GET_ALL_RESTAURANTS_SUMMARY,
+            description = SwaggerConstants.GET_ALL_RESTAURANTS_DESCRIPTION,
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    description = "get all restaurants",
+                    content = @Content(schema = @Schema(implementation = CreateRestaurantRequest.class))
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = " get all restaurants successfully",
+                            content = @Content(schema = @Schema(implementation = CreateRestaurantResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized - only Clients can to see restaurants",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Unexpected internal error",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    )
+            }
+    )
     @GetMapping
     public ResponseEntity<PageResponse<GetAllRestaurantsData>> listRestaurants(
             @RequestHeader(name = "X-User-role") String role,
@@ -105,6 +127,37 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantPageableService.getRestaurants(page, size));
     }
 
+    @Operation(
+            summary = SwaggerConstants.ASSIGN_EMPLOYEE_SUMMARY,
+            description = SwaggerConstants.ASSIGN_EMPLOYEE_DESCRIPTION,
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    description = "assign employee to a restaurant",
+                    content = @Content(schema = @Schema(implementation = CreateRestaurantRequest.class))
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "employee assign to a restaurant successfully",
+                            content = @Content(schema = @Schema(implementation = CreateRestaurantResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "bad request",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized - only Owners can to assign employee to restaurants",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Unexpected internal error",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    )
+            }
+    )
     @PostMapping("/{restaurantId}/employees")
     public ResponseEntity<MessageResponse> assignEmployeeToRestaurant(
             @RequestHeader(name = "X-User-id") Long ownerId,

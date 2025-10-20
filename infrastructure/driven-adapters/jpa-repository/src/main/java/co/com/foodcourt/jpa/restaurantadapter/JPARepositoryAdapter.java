@@ -43,7 +43,7 @@ implements RestaurantRepository
 
         log.info(LogConstants.FIND_RESTAURANT_BY_ID.getMessage(),restaurantId);
         RestaurantEntity restaurantFound = repository.findById(restaurantId)
-                .orElseThrow(()-> new RestaurantNotFoundException(ErrorConstants.RESTAURANT_NOT_FOUND.getMessage()+restaurantId));
+                .orElseThrow(()-> new RestaurantNotFoundException(ErrorConstants.RESTAURANT_NOT_FOUND.getMessage(),restaurantId));
 
         log.info(LogConstants.RESTAURANT_FOUND.getMessage(),restaurantFound.getRestaurantId());
         Restaurant restaurant = toEntity(restaurantFound);
@@ -57,6 +57,6 @@ implements RestaurantRepository
         return repository.findAllByOrderByNameAsc()
                 .stream()
                 .map(entity -> super.mapper.map(entity, Restaurant.class))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

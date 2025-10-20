@@ -16,6 +16,8 @@ public enum LogConstants {
     GET_ALL_DISHES_SUCCESS("Get all dishes successfully"),
     ASSIGN_EMPLOYEE_REQUEST("Request for assign employee with id {} received"),
     ASSIGN_EMPLOYEE_SUCCESS("Employee assign successfully"),
+    CREATE_ORDER_REQUEST("Request to create order for client {} at restaurant {}"),
+    CREATE_ORDER_SUCCESS("Order created successfully with ID {}"),
     TIMESTAMP("timestamp:"),
     ERROR("error:"),
     DETAILS("details:");

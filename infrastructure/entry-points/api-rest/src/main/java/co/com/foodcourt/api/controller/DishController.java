@@ -66,10 +66,6 @@ public class DishController {
                     )
             }
     )
-    @Parameters({
-            @Parameter(name = "X-User-id", description = SwaggerConstants.USER_ROLE_DESCRIPTION, example = "1", required = true),
-            @Parameter(name = "X-User-role", description = SwaggerConstants.USER_ROLE_DESCRIPTION, example = "OWNER", required = true)
-    })
     @PostMapping
     public ResponseEntity<CreateDishResponse> createDish(@RequestHeader("X-User-id") Long ownerId,
                                                          @RequestHeader("X-User-role") String role,
@@ -120,10 +116,6 @@ public class DishController {
                     )
             }
     )
-    @Parameters({
-            @Parameter(name = "X-User-id", description = SwaggerConstants.USER_ROLE_DESCRIPTION, example = "1", required = true),
-            @Parameter(name = "X-User-role", description = SwaggerConstants.USER_ROLE_DESCRIPTION, example = "OWNER", required = true)
-    })
     @PatchMapping("/{dishId}")
     public ResponseEntity<UpdateDishResponse> updateDish(@PathVariable("dishId") Long dishId,
                                                          @RequestHeader("X-User-role") String role,
@@ -139,6 +131,37 @@ public class DishController {
         return ResponseEntity.status(HttpStatus.OK).body(UpdateDishMapper.INSTANCE.toResponse(disCreated));
     }
 
+    @Operation(
+            summary = SwaggerConstants.GET_ALL_DISHES_SUMMARY,
+            description = SwaggerConstants.GET_ALL_DISHES_DESCRIPTION,
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    description = "Get all dishes",
+                    content = @Content(schema = @Schema(implementation = UpdateDishRequest.class))
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Dish successfully updated",
+                            content = @Content(schema = @Schema(implementation = UpdateDishResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid request body or validation error",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized - only Clients can to see dishes",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Unexpected internal error",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    )
+            }
+    )
     @GetMapping
     public ResponseEntity<PageResponse<GetAllDishesData>> listDishes(
             @RequestHeader(name = "X-User-role") String role,

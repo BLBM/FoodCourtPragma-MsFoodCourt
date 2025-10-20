@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record CreateDishRequest(
 
-
         @NotBlank(message = "name is required")
         String name,
         @NotNull(message = "price is required")

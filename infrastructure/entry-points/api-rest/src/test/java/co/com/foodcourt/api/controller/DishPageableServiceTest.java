@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class DishPageableServiceTest {
+class DishPageableServiceTest {
 
     @Mock
     private DishUseCase dishUseCase;
@@ -54,13 +54,13 @@ public class DishPageableServiceTest {
     @Test
     void shouldExecuteMapperLambdaAndReturnMappedRestaurants() {
 
-        String restaurantName = "Frisby";
+        Long restaurantId = 1L;
         Long categoryId = 1L;
 
-        when(dishUseCase.getAllDishesByRestaurant(restaurantName, categoryId))
+        when(dishUseCase.getAllDishesByRestaurant(restaurantId, categoryId))
                 .thenReturn(mockDishes);
 
-        PageResponse<GetAllDishesData> result = dishPageableService.getDishes(restaurantName, categoryId, 1, 10);
+        PageResponse<GetAllDishesData> result = dishPageableService.getDishes(restaurantId, categoryId, 1, 10);
 
         assertEquals(2, result.content().size());
         assertEquals("HotDog", result.content().get(0).name());

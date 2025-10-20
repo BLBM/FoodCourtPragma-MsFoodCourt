@@ -1,36 +1,32 @@
 package co.com.foodcourt.usecase.util;
 
+import co.com.foodcourt.model.order.Order;
 import co.com.foodcourt.model.order.OrderDish;
 import co.com.foodcourt.model.order.OrderStatus;
 import co.com.foodcourt.model.order.gateways.OrderRepository;
 import co.com.foodcourt.model.plate.Dish;
 import co.com.foodcourt.model.plate.gateways.DishRepository;
-import co.com.foodcourt.model.restaurant.Restaurant;
 import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
 import co.com.foodcourt.usecase.common.ValidationMessages;
 import co.com.foodcourt.usecase.exception.ValidationException;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class ValidateOrder {
-
-    private ValidateOrder() {
-        throw new IllegalStateException("Utility class");
-    }
 
     public static void validateOrderCreation(
             Long clientId,
-            Long restaurantId,
-            List<OrderDish> orderDishes,
+            Order order,
             OrderRepository orderRepository,
             DishRepository dishRepository,
             RestaurantRepository restaurantRepository
     ) {
         validateClientHasNoOrderInProcess(clientId, orderRepository);
-        validateDishesBelongToRestaurant(restaurantId, orderDishes, dishRepository);
-        validateRestaurantExists(restaurantId, restaurantRepository);
+        validateDishesBelongToRestaurant(order.getRestaurant().getRestaurantId(), order.getDishes(), dishRepository, restaurantRepository);
     }
 
     private static void validateClientHasNoOrderInProcess(Long clientId, OrderRepository orderRepository) {
@@ -46,8 +42,12 @@ public class ValidateOrder {
     private static void validateDishesBelongToRestaurant(
             Long restaurantId,
             List<OrderDish> orderDishes,
-            DishRepository dishRepository
+            DishRepository dishRepository,
+            RestaurantRepository restaurantRepository
     ) {
+
+        restaurantRepository.getRestaurantById(restaurantId);
+
         Set<Long> validDishIds = dishRepository.findByRestaurantId(restaurantId)
                 .stream()
                 .map(Dish::getDishId)
@@ -69,10 +69,4 @@ public class ValidateOrder {
         }
     }
 
-    private static void validateRestaurantExists(Long restaurantId, RestaurantRepository restaurantRepository) {
-        Restaurant restaurant = restaurantRepository.getRestaurantById(restaurantId);
-        if (restaurant == null) {
-            throw new ValidationException(ValidationMessages.INVALID_RESTAURANT_NO_EXISTS.getMessage());
-        }
-    }
 }

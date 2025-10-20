@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(DishController.class)
 @ContextConfiguration(classes = {DishController.class, GlobalExceptionHandler.class})
-public class DishControllerTest {
+class DishControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -116,7 +116,7 @@ public class DishControllerTest {
     }
 
 
-    /// /////////////////// Feature hu4 patch dish/////////////////////
+    /*  FEATURE HU 4  */
 
     @Test
     void shouldUpdateDishSuccessfully() throws Exception {
@@ -166,7 +166,7 @@ public class DishControllerTest {
                 .andExpect(jsonPath("$.details:").value("Custom business validation failed"));
     }
 
-    ///////////////////////////////// FEATURE HU 10 //////////////////////////////////////////
+    /*  FEATURE HU 10  */
 
     @Test
     void shouldReturnOkWhenRoleIsClient() throws Exception {
@@ -175,11 +175,11 @@ public class DishControllerTest {
                 1, 10, 1, 1, false, false, true, true
         );
 
-        when(dishPageableService.getDishes("El Corral", null, 1, 10)).thenReturn(mockResponse);
+        when(dishPageableService.getDishes(1L, null, 1, 10)).thenReturn(mockResponse);
 
         mockMvc.perform(get("/api/v1/dishes")
                         .header("X-User-role", "CLIENT")
-                        .param("restaurantName", "El Corral")
+                        .param("restaurantId", String.valueOf(1L))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].name").value("Burger"));
@@ -194,7 +194,7 @@ public class DishControllerTest {
 
         mockMvc.perform(get("/api/v1/dishes")
                         .header("X-User-role", "OWNER")
-                        .param("restaurantName", "El Corral")
+                        .param("restaurantId", String.valueOf(1L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDishRequest)))
                 .andExpect(status().isUnauthorized())
@@ -203,12 +203,12 @@ public class DishControllerTest {
 
     @Test
     void shouldReturnNotFoundWhenNoDishesAvailable() throws Exception {
-        when(dishPageableService.getDishes("El Corral", null, 1, 10))
+        when(dishPageableService.getDishes(1L, null, 1, 10))
                 .thenThrow(new DishNotFoundException("No dishes found for restaurant: El Corral"));
 
         mockMvc.perform(get("/api/v1/dishes")
                         .header("X-User-role", "CLIENT")
-                        .param("restaurantName", "El Corral")
+                        .param("restaurantId", String.valueOf(1L))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error:").value("Business validation error"))

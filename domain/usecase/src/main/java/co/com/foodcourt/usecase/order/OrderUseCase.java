@@ -1,7 +1,7 @@
 package co.com.foodcourt.usecase.order;
 
+import co.com.foodcourt.model.employee_restaurant.gateways.EmployeeRestaurantRepository;
 import co.com.foodcourt.model.order.Order;
-import co.com.foodcourt.model.order.OrderDish;
 import co.com.foodcourt.model.order.OrderStatus;
 import co.com.foodcourt.model.order.gateways.OrderRepository;
 import co.com.foodcourt.model.plate.gateways.DishRepository;
@@ -9,8 +9,7 @@ import co.com.foodcourt.model.restaurant.Restaurant;
 import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
 import co.com.foodcourt.usecase.util.ValidateOrder;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
+import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 public class OrderUseCase {
@@ -18,26 +17,27 @@ public class OrderUseCase {
     private final OrderRepository orderRepository;
     private final RestaurantRepository restaurantRepository;
     private final DishRepository dishRepository;
+    private final EmployeeRestaurantRepository employeeRestaurantRepository;
 
 
-    public Order createOrder(Long clientId, Long restaurantId, List<OrderDish> orderDishes){
+    public Order createOrder(Order orderRequest, Long clientId){
 
         ValidateOrder.validateOrderCreation(
                 clientId,
-                restaurantId,
-                orderDishes,
+                orderRequest,
                 orderRepository,
                 dishRepository,
                 restaurantRepository
         );
 
-        Restaurant restaurant = restaurantRepository.getRestaurantById(restaurantId);
+        Restaurant restaurant = restaurantRepository.getRestaurantById(orderRequest.getRestaurant().getRestaurantId());
 
         Order order = Order.builder()
                 .clientId(clientId)
                 .restaurant(restaurant)
-                .dishes(orderDishes)
+                .dishes(orderRequest.getDishes())
                 .status(OrderStatus.PENDING)
+                .creationDate(LocalDateTime.now())
                 .build();
 
         return orderRepository.saveOrder(order);

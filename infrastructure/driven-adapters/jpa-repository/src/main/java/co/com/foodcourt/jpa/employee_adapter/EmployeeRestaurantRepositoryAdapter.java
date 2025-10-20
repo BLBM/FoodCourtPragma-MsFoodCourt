@@ -37,6 +37,7 @@ public class EmployeeRestaurantRepositoryAdapter extends AdapterOperations
 
         log.info(LogConstants.EMPLOYEE_RESTAURANT_SAVED.getMessage(),employeeRestaurantSaved.getId());
     }
+
 }
 
 

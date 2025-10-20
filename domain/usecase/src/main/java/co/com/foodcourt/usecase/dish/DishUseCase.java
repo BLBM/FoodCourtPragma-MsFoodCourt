@@ -64,7 +64,7 @@ public class DishUseCase {
         }
         List<Dish> dishes = (categoryId == null)
                 ? dishRepository.findByRestaurantId(restaurantId)
-                : dishRepository.findByRestaurantNameAndCategoryId(restaurantId, categoryId);
+                : dishRepository.findByRestaurantIdAndCategoryId(restaurantId, categoryId);
 
         if (dishes.isEmpty()) {
             throw new DishNotFoundException(ValidationMessages.DISHES_NOT_FOUND_FOR_RESTAURANT.getMessage() + restaurantId);

@@ -1,11 +1,12 @@
 package co.com.foodcourt.config;
 
-import co.com.foodcourt.model.plate.Dish;
+import co.com.foodcourt.model.order.gateways.OrderRepository;
 import co.com.foodcourt.model.plate.gateways.DishRepository;
 import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
 import co.com.foodcourt.model.user.gateways.UserRepository;
 import co.com.foodcourt.usecase.createrestaurant.CreateRestaurantUseCase;
 import co.com.foodcourt.usecase.dish.DishUseCase;
+import co.com.foodcourt.usecase.order.OrderUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,11 @@ public class UseCasesConfig {
     @Bean
     public DishUseCase dishUseCase(RestaurantRepository restaurantRepository, DishRepository dishRepository){
         return new DishUseCase(dishRepository,restaurantRepository);
+    }
+
+    @Bean
+    public OrderUseCase orderUseCase(OrderRepository orderRepository,RestaurantRepository restaurantRepository,DishRepository dishRepository){
+        return new OrderUseCase(orderRepository,restaurantRepository,dishRepository);
     }
 
 }

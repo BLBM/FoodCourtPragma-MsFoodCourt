@@ -1,9 +1,11 @@
 package co.com.foodcourt.api.global_exception_handler;
 
 
+import co.com.foodcourt.api.common.ErrorMessages;
 import co.com.foodcourt.api.common.LogConstants;
 import co.com.foodcourt.api.exception.UnauthorizedException;
 import co.com.foodcourt.model.plate.exception.DishNotFoundException;
+import co.com.foodcourt.model.restaurant.exception.RestaurantNotFoundException;
 import co.com.foodcourt.model.user.exception.ExternalServiceException;
 import co.com.foodcourt.usecase.exception.ValidationException;
 import lombok.extern.slf4j.Slf4j;
@@ -39,17 +41,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleValidationException(ValidationException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put(LogConstants.TIMESTAMP.getMessage(), LocalDateTime.now());
-        body.put(LogConstants.ERROR.getMessage(), "Business validation error");
+        body.put(LogConstants.ERROR.getMessage(), "");
         body.put(LogConstants.DETAILS.getMessage(), ex.getMessage());
         return ResponseEntity.badRequest().body(body);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
-        log.error("Unexpected error",ex);
+        log.error(ErrorMessages.UNEXPECTED_ERROR.getMessage(),ex);
         Map<String, Object> body = new HashMap<>();
         body.put(LogConstants.TIMESTAMP.getMessage(), LocalDateTime.now());
-        body.put(LogConstants.ERROR.getMessage(), "Unexpected error");
+        body.put(LogConstants.ERROR.getMessage(), ErrorMessages.UNEXPECTED_ERROR.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
@@ -57,7 +59,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleExternalServiceException(ExternalServiceException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put(LogConstants.TIMESTAMP.getMessage(), LocalDateTime.now());
-        body.put(LogConstants.ERROR.getMessage(), "Unexpected error");
+        body.put(LogConstants.ERROR.getMessage(), ErrorMessages.UNEXPECTED_ERROR.getMessage());
         return ResponseEntity.badRequest().body(body);
     }
 
@@ -74,7 +76,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleDishNotFoundException(DishNotFoundException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put(LogConstants.TIMESTAMP.getMessage(), LocalDateTime.now());
-        body.put(LogConstants.ERROR.getMessage(), "Business validation error");
+        body.put(LogConstants.ERROR.getMessage(), ErrorMessages.BUSINESS_VALIDATION_ERROR.getMessage());
+        body.put(LogConstants.DETAILS.getMessage(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(RestaurantNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleRestaurantNotFoundException(RestaurantNotFoundException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put(LogConstants.TIMESTAMP.getMessage(), LocalDateTime.now());
+        body.put(LogConstants.ERROR.getMessage(),  ErrorMessages.BUSINESS_VALIDATION_ERROR.getMessage());
         body.put(LogConstants.DETAILS.getMessage(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
