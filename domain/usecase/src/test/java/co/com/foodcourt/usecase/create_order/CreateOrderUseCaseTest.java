@@ -1,6 +1,8 @@
-package co.com.foodcourt.usecase.order;
+package co.com.foodcourt.usecase.create_order;
 
 
+import co.com.foodcourt.model.actor.Actor;
+import co.com.foodcourt.model.actor.ActorRole;
 import co.com.foodcourt.model.employee_restaurant.gateways.EmployeeRestaurantRepository;
 import co.com.foodcourt.model.order.Order;
 import co.com.foodcourt.model.order.OrderDish;
@@ -25,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class OrderUseCaseTest {
+class CreateOrderUseCaseTest {
 
     @Mock
     private OrderRepository orderRepository;
@@ -40,12 +42,13 @@ class OrderUseCaseTest {
     private EmployeeRestaurantRepository employeeRestaurantRepository;
 
     @InjectMocks
-    private OrderUseCase orderUseCase;
+    private CreateOrderUseCase createOrderUseCase;
 
     private Restaurant restaurant;
     private Dish dish;
-    private OrderDish orderDish;
     private Order orderRequest;
+    private Actor actor;
+
 
     @BeforeEach
     void setUp() {
@@ -59,7 +62,7 @@ class OrderUseCaseTest {
                 .name("Cheeseburger")
                 .build();
 
-        orderDish = OrderDish.builder()
+        OrderDish orderDish = OrderDish.builder()
                 .dish(dish)
                 .quantity(2)
                 .build();
@@ -70,12 +73,13 @@ class OrderUseCaseTest {
                 .status(OrderStatus.PENDING)
                 .dishes(List.of(orderDish))
                 .build();
+
+        actor = Actor.builder().id(1L).email("test@gmail.cm").role(ActorRole.CLIENT).build();
     }
 
 
     @Test
     void shouldCreateOrderSuccessfully() {
-        Long clientId = 100L;
 
         when(orderRepository.existsByClientIdAndStatusIn(anyLong(), anyList())).thenReturn(false);
 
@@ -83,7 +87,7 @@ class OrderUseCaseTest {
         when(restaurantRepository.getRestaurantById(1L)).thenReturn(restaurant);
         when(orderRepository.saveOrder(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Order result = orderUseCase.createOrder(orderRequest, clientId);
+        Order result = createOrderUseCase.createOrder(orderRequest, actor);
 
         assertNotNull(result);
         assertEquals(OrderStatus.PENDING, result.getStatus());
@@ -93,12 +97,11 @@ class OrderUseCaseTest {
 
     @Test
     void shouldThrowExceptionWhenClientHasOrderInProcess() {
-        Long clientId = 100L;
         when(orderRepository.existsByClientIdAndStatusIn(anyLong(), anyList())).thenReturn(true);
 
         ValidationException ex = assertThrows(
                 ValidationException.class,
-                () -> orderUseCase.createOrder(orderRequest, clientId)
+                () -> createOrderUseCase.createOrder(orderRequest, actor)
         );
 
         assertEquals(ValidationMessages.INVALID_YET_ORDER_IN_PROCESS.getMessage(), ex.getMessage());
@@ -107,7 +110,6 @@ class OrderUseCaseTest {
 
     @Test
     void shouldThrowExceptionWhenDishNotBelongToRestaurant() {
-        Long clientId = 200L;
         when(orderRepository.existsByClientIdAndStatusIn(anyLong(), anyList())).thenReturn(false);
         when(restaurantRepository.getRestaurantById(1L)).thenReturn(restaurant);
 
@@ -117,7 +119,7 @@ class OrderUseCaseTest {
 
         ValidationException ex = assertThrows(
                 ValidationException.class,
-                () -> orderUseCase.createOrder(orderRequest, clientId)
+                () -> createOrderUseCase.createOrder(orderRequest, actor)
         );
 
         assertTrue(ex.getMessage().contains("restaurant"));
@@ -137,7 +139,7 @@ class OrderUseCaseTest {
         when(orderRepository.findByRestaurantAndStatus(restaurantId, status))
                 .thenReturn(List.of(orderRequest));
 
-        List<Order> result = orderUseCase.getAllOrderByStatus(employeeId, status);
+        List<Order> result = createOrderUseCase.getAllOrderByStatus(employeeId, status);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -154,7 +156,7 @@ class OrderUseCaseTest {
                 .thenReturn(null);
 
         ValidationException ex = assertThrows(ValidationException.class, () ->
-                orderUseCase.getAllOrderByStatus(employeeId, "PENDING"));
+                createOrderUseCase.getAllOrderByStatus(employeeId, "PENDING"));
 
         assertEquals(ValidationMessages.INVALID_EMPLOYEE_NOT_BELONG.getMessage(), ex.getMessage());
         verify(employeeRestaurantRepository).findRestaurantIdByEmployeeId(employeeId);
@@ -172,7 +174,7 @@ class OrderUseCaseTest {
         when(orderRepository.findByRestaurantAndStatus(restaurantId, status))
                 .thenReturn(List.of());
 
-        List<Order> result = orderUseCase.getAllOrderByStatus(employeeId, status);
+        List<Order> result = createOrderUseCase.getAllOrderByStatus(employeeId, status);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());

@@ -6,20 +6,21 @@ import co.com.foodcourt.model.order.Order;
 import co.com.foodcourt.model.order.OrderStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
 @Mapper(uses = {DishEntityMapper.class,
         RestaurantEntityMapper.class,
-        OrderDishEntityMapper.class},componentModel = "spring")
+        OrderDishEntityMapper.class},componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface OrderEntityMapper {
 
 
-    @Mapping(target = "chef", ignore = true)
+    @Mapping(target = "chef", source = "chefId")
     @Mapping(target = "dishes", source = "orderDishes")
     Order toDomain(OrderEntity entity);
 
-    @Mapping(target = "chefId", ignore = true)
+    @Mapping(target = "chefId", source = "chef")
     @Mapping(target = "orderDishes", source = "dishes")
     @Mapping(target = "restaurant", source = "restaurant")
     @Mapping(target = "clientId", source = "clientId")

@@ -9,12 +9,13 @@ import co.com.foodcourt.model.restaurant.Restaurant;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
 import java.util.Collections;
 import java.util.List;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SaveOrderMapper {
 
     SaveOrderMapper INSTANCE = Mappers.getMapper(SaveOrderMapper.class);
@@ -22,6 +23,8 @@ public interface SaveOrderMapper {
     @Mapping(target = "orderId", ignore = true)
     @Mapping(target = "clientId", ignore = true)
     @Mapping(target = "chef", ignore = true)
+    @Mapping(target = "securityPin", ignore = true)
+    @Mapping(target = "deliveredDate", ignore = true)
     @Mapping(target = "status", constant = "PENDING")
     @Mapping(target = "creationDate", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "restaurant", source = "restaurantId", qualifiedByName = "mapRestaurantFromId")

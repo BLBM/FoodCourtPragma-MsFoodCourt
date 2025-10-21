@@ -14,7 +14,10 @@ public enum LogConstants {
     EMPLOYEE_RESTAURANT_SAVED("Relation employee restaurant saved: {}"),
     SAVE_ORDER("Saving order for clientId={} and restaurantId={}"),
     SAVE_ORDER_SUCCESS("Order saved successfully with id={}"),
-    CHECK_ORDERS_CLIENT("Checking if client {} has active orders in statuses {}");
+    CHECK_ORDERS_CLIENT("Checking if client {} has active orders in statuses {}"),
+    FIND_ORDER_BY_ID("Searching for order with id [{}]"),
+    FIND_ORDER_BY_ID_SUCCESS("Order [{}] retrieved successfully");
+
 
     private final String message;
 

@@ -3,7 +3,9 @@ package co.com.foodcourt.usecase.util;
 import co.com.foodcourt.model.plate.Dish;
 import co.com.foodcourt.usecase.common.ValidationMessages;
 import co.com.foodcourt.usecase.exception.ValidationException;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class ValidateDish {
 
     private static final int MIN_VALUE = 0;

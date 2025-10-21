@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UpdateDishMapper {
 
     UpdateDishMapper INSTANCE = Mappers.getMapper(UpdateDishMapper.class);

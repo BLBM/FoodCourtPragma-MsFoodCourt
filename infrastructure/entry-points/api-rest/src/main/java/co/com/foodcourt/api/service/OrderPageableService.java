@@ -4,7 +4,7 @@ import co.com.foodcourt.api.dto.GetAllOrdersData;
 import co.com.foodcourt.api.dto.OrderDishData;
 import co.com.foodcourt.api.dto.PageResponse;
 import co.com.foodcourt.model.order.Order;
-import co.com.foodcourt.usecase.order.OrderUseCase;
+import co.com.foodcourt.usecase.create_order.CreateOrderUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class OrderPageableService {
-    private final OrderUseCase getOrdersByStatusUseCase;
+    private final CreateOrderUseCase getOrdersByStatusUseCase;
     private final PageableService pageableService;
 
     public PageResponse<GetAllOrdersData> getOrders(Long employeeId, String status, int page, int size) {

@@ -1,10 +1,11 @@
 package co.com.foodcourt.usecase.util;
 
-import co.com.foodcourt.model.restaurant.Restaurant;
 import co.com.foodcourt.model.user.User;
 import co.com.foodcourt.usecase.common.ValidationMessages;
 import co.com.foodcourt.usecase.exception.ValidationException;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class ValidateUser {
 
     private static final String ROL_OWNER = "OWNER";

@@ -26,6 +26,9 @@ public class OrderEntity {
     @Column(name = "creation_date", nullable = false)
     private LocalDateTime creationDate;
 
+    @Column(name = "delivered_date")
+    private LocalDateTime deliveredDate;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private RestaurantEntity restaurant;
@@ -39,4 +42,7 @@ public class OrderEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", nullable = false, length = 20)
     private OrderStatusEntity status;
+
+    @Column(name = "securityPin")
+    private String securityPin;
 }

@@ -26,3 +26,5 @@ include ':jpa-repository'
 project(':jpa-repository').projectDir = file('./infrastructure/driven-adapters/jpa-repository')
 include ':rest-consumer'
 project(':rest-consumer').projectDir = file('./infrastructure/driven-adapters/rest-consumer')
+include ':call-me-bot'
+project(':call-me-bot').projectDir = file('./infrastructure/driven-adapters/call-me-bot')

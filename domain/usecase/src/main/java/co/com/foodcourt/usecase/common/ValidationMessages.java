@@ -18,7 +18,21 @@ public enum ValidationMessages {
     INVALID_DISHES_FOR_RESTAURANT("The following dishes do not belong to the restaurant with id %s: %s"),
     DISHES_NOT_FOUND_FOR_RESTAURANT("No dishes found for restaurant: {} "),
     INVALID_RESTAURANT_PARAM("Restaurant name must be provided"),
-    INVALID_EMPLOYEE_NOT_BELONG("The employee does not belong to any restaurant.");
+    INVALID_EMPLOYEE_NOT_BELONG("The employee does not belong to any restaurant."),
+    INVALID_STATUS("invalid status"),
+
+    INVALID_CANCEL_ROLE("Only the client can cancel an order."),
+    INVALID_CANCEL_STATE("Only pending orders can be canceled."),
+    INVALID_EMPLOYEE_ROLE("Only employees can change the order status."),
+    INVALID_PREPARATION_TRANSITION("Only pending orders can move to preparation."),
+    INVALID_READY_TRANSITION("Only orders in preparation can be marked as 'Ready'."),
+    INVALID_READY_EMPLOYEE("Only the assigned employee can mark this order as 'Ready'."),
+    INVALID_DELIVERED_TRANSITION("Only orders with status 'Ready' can be delivered."),
+    INVALID_DELIVERED_EMPLOYEE("Only the assigned employee can mark this order as 'Delivered'."),
+    INVALID_PIN("A valid security PIN is required to deliver the order.");
+
+
+
 
     private final String message;
 

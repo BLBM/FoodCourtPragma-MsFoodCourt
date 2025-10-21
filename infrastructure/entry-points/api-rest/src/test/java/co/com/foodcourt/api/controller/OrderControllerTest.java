@@ -15,7 +15,7 @@ import co.com.foodcourt.model.order.OrderStatus;
 import co.com.foodcourt.model.plate.Dish;
 import co.com.foodcourt.model.restaurant.Restaurant;
 import co.com.foodcourt.model.restaurant.exception.RestaurantNotFoundException;
-import co.com.foodcourt.usecase.order.OrderUseCase;
+import co.com.foodcourt.usecase.create_order.CreateOrderUseCase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ class OrderControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private OrderUseCase orderUseCase;
+    private CreateOrderUseCase createOrderUseCase;
 
     @MockitoBean
     private OrderPageableService orderPageableService;
@@ -106,7 +106,7 @@ class OrderControllerTest {
                         .build()))
                 .build();
 
-        when(orderUseCase.createOrder(any(Order.class), eq(CLIENT_ID)))
+        when(createOrderUseCase.createOrder(any(Order.class), eq(CLIENT_ID)))
                 .thenReturn(mockOrder);
 
         mockMvc.perform(post(BASE_URL)
@@ -121,7 +121,7 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.status").value("PENDING"))
                 .andExpect(jsonPath("$.creationDate").exists());
 
-        verify(orderUseCase).createOrder(any(Order.class), eq(CLIENT_ID));
+        verify(createOrderUseCase).createOrder(any(Order.class), eq(CLIENT_ID));
     }
 
     @Test
@@ -139,7 +139,7 @@ class OrderControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.error:").value("Unauthorized"));
 
-        verify(orderUseCase, never()).createOrder(any(), anyLong());
+        verify(createOrderUseCase, never()).createOrder(any(), anyLong());
     }
 
     @Test
@@ -158,7 +158,7 @@ class OrderControllerTest {
                         .content(invalidJson))
                 .andExpect(status().isBadRequest());
 
-        verify(orderUseCase, never()).createOrder(any(), anyLong());
+        verify(createOrderUseCase, never()).createOrder(any(), anyLong());
     }
 
 
@@ -169,7 +169,7 @@ class OrderControllerTest {
                 List.of(new CreateOrderRequest.DishRequest(10L, 2))
         );
 
-        when(orderUseCase.createOrder(any(Order.class), eq(CLIENT_ID)))
+        when(createOrderUseCase.createOrder(any(Order.class), eq(CLIENT_ID)))
                 .thenThrow(new RestaurantNotFoundException("Not found Restaurant"));
 
         mockMvc.perform(post(BASE_URL)

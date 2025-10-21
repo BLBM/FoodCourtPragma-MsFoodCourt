@@ -46,6 +46,12 @@ springdoc:
     display-request-duration: true
 
 
+whatsapp:
+  api:
+    url: ${WHATSAPP_API_URL}
+    key: ${WHATSAPP_API_KEY}
+    default-phone: ${WHATSAPP_DEFAULT_PHONE}
+
 adapter:
   restconsumer:
     url: ${MS_AUTH_URL}

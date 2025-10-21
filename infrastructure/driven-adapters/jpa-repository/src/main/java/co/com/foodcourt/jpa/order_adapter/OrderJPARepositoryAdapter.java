@@ -1,12 +1,14 @@
 package co.com.foodcourt.jpa.order_adapter;
 
 
+import co.com.foodcourt.jpa.common.ErrorConstants;
 import co.com.foodcourt.jpa.common.LogConstants;
 import co.com.foodcourt.jpa.entity.OrderEntity;
 import co.com.foodcourt.jpa.entity.OrderStatusEntity;
 import co.com.foodcourt.jpa.mapper.OrderEntityMapper;
 import co.com.foodcourt.model.order.Order;
 import co.com.foodcourt.model.order.OrderStatus;
+import co.com.foodcourt.model.order.exception.OrderNotFoundException;
 import co.com.foodcourt.model.order.gateways.OrderRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,19 @@ public class OrderJPARepositoryAdapter implements OrderRepository {
 
         log.info(LogConstants.SAVE_ORDER_SUCCESS.getMessage(), savedEntity.getOrderId());
         return mapper.toDomain(savedEntity);
+    }
+
+    @Override
+    public Order findById(Long orderId) {
+        log.info(LogConstants.FIND_ORDER_BY_ID.getMessage(), orderId);
+
+        OrderEntity entity = repository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(ErrorConstants.ORDER_NOT_FOUND.getMessage()));
+
+        Order domain = mapper.toDomain(entity);
+
+        log.info(LogConstants.FIND_ORDER_BY_ID_SUCCESS.getMessage(), orderId);
+        return domain;
     }
 
     @Override

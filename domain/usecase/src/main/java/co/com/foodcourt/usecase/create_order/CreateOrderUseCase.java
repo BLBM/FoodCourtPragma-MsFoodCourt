@@ -1,5 +1,6 @@
-package co.com.foodcourt.usecase.order;
+package co.com.foodcourt.usecase.create_order;
 
+import co.com.foodcourt.model.actor.Actor;
 import co.com.foodcourt.model.employee_restaurant.gateways.EmployeeRestaurantRepository;
 import co.com.foodcourt.model.order.Order;
 import co.com.foodcourt.model.order.OrderStatus;
@@ -9,24 +10,26 @@ import co.com.foodcourt.model.restaurant.Restaurant;
 import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
 import co.com.foodcourt.usecase.common.ValidationMessages;
 import co.com.foodcourt.usecase.exception.ValidationException;
+import co.com.foodcourt.usecase.traceability_recorder.TraceabilityRecorderUseCase;
 import co.com.foodcourt.usecase.util.ValidateOrder;
 import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class OrderUseCase {
+public class CreateOrderUseCase {
 
     private final OrderRepository orderRepository;
     private final RestaurantRepository restaurantRepository;
     private final DishRepository dishRepository;
     private final EmployeeRestaurantRepository employeeRestaurantRepository;
+    private final TraceabilityRecorderUseCase traceabilityRecorderUseCase;
 
 
-    public Order createOrder(Order orderRequest, Long clientId){
+    public Order createOrder(Order orderRequest, Actor actor){
 
         ValidateOrder.validateOrderCreation(
-                clientId,
+                actor.getId(),
                 orderRequest,
                 orderRepository,
                 dishRepository,
@@ -36,13 +39,14 @@ public class OrderUseCase {
         Restaurant restaurant = restaurantRepository.getRestaurantById(orderRequest.getRestaurant().getRestaurantId());
 
         Order order = Order.builder()
-                .clientId(clientId)
+                .clientId(actor.getId())
                 .restaurant(restaurant)
                 .dishes(orderRequest.getDishes())
                 .status(OrderStatus.PENDING)
                 .creationDate(LocalDateTime.now())
                 .build();
 
+        traceabilityRecorderUseCase.recordTrace(order,null,OrderStatus.PENDING,actor);
         return orderRepository.saveOrder(order);
     }
 

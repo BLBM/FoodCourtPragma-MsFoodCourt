@@ -7,7 +7,7 @@ import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
 import co.com.foodcourt.model.user.gateways.UserRepository;
 import co.com.foodcourt.usecase.createrestaurant.CreateRestaurantUseCase;
 import co.com.foodcourt.usecase.dish.DishUseCase;
-import co.com.foodcourt.usecase.order.OrderUseCase;
+import co.com.foodcourt.usecase.create_order.CreateOrderUseCase;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -60,7 +60,7 @@ class UseCasesConfigTest {
         public DishRepository dishRepository(){return  Mockito.mock(DishRepository.class);}
 
         @Bean
-        public OrderUseCase orderUseCase(){return  Mockito.mock(OrderUseCase.class);}
+        public CreateOrderUseCase orderUseCase(){return  Mockito.mock(CreateOrderUseCase.class);}
 
         @Bean
         public OrderRepository orderRepository(){return  Mockito.mock(OrderRepository.class);}

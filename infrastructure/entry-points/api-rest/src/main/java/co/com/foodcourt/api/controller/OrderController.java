@@ -7,9 +7,13 @@ import co.com.foodcourt.api.common.SwaggerConstants;
 import co.com.foodcourt.api.dto.*;
 import co.com.foodcourt.api.exception.UnauthorizedException;
 import co.com.foodcourt.api.mapper.SaveOrderMapper;
+import co.com.foodcourt.api.mapper.UpdateOrderMapper;
 import co.com.foodcourt.api.service.OrderPageableService;
+import co.com.foodcourt.model.actor.Actor;
+import co.com.foodcourt.model.actor.ActorRole;
 import co.com.foodcourt.model.order.Order;
-import co.com.foodcourt.usecase.order.OrderUseCase;
+import co.com.foodcourt.usecase.create_order.CreateOrderUseCase;
+import co.com.foodcourt.usecase.update_order.UpdateOrderUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,8 +36,9 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Orders", description = SwaggerConstants.TAG_ORDERS_CONTROLLER)
 public class OrderController {
 
-    private final OrderUseCase orderUseCase;
+    private final CreateOrderUseCase createOrderUseCase;
     private final OrderPageableService orderPageableService;
+    private final UpdateOrderUseCase updateOrderUseCase;
 
 
     @Operation(
@@ -70,6 +75,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<CreateOrderResponse> createOrder(
             @RequestHeader("X-User-role") String role,
+            @RequestHeader(name = "X-User-Email") String email,
             @RequestHeader("X-User-id") Long clientId,
             @Valid @RequestBody CreateOrderRequest request){
 
@@ -77,9 +83,15 @@ public class OrderController {
             throw new UnauthorizedException(ErrorMessages.INVALID_ROLE_CREATE_ORDER.getMessage());
         }
 
+        Actor actor = Actor.builder()
+                .id(clientId)
+                .email(email)
+                .role(ActorRole.valueOf(role.toUpperCase()))
+                .build();
+
         log.info(LogConstants.CREATE_ORDER_SUCCESS.getMessage(), clientId, request.restaurantId());
 
-        Order order = orderUseCase.createOrder(SaveOrderMapper.INSTANCE.toDomain(request),clientId);
+        Order order = createOrderUseCase.createOrder(SaveOrderMapper.INSTANCE.toDomain(request),actor);
 
         CreateOrderResponse response = SaveOrderMapper.INSTANCE.toResponse(order);
 
@@ -104,5 +116,35 @@ public class OrderController {
         log.info(LogConstants.GET_ALL_ORDERS_REQUEST.getMessage());
         return ResponseEntity.ok(orderPageableService.getOrders(employeeId, status, page, size));
     }
+
+
+    @PatchMapping("/{orderId}/status")
+    public ResponseEntity<UpdateOrderResponse> updateOrderStatus(
+            @PathVariable(name = "orderId") Long orderId,
+            @RequestHeader(name = "X-User-Id") Long userId,
+            @RequestHeader(name = "X-User-Email") String email,
+            @RequestHeader(name = "X-User-Role") String role,
+            @Valid @RequestBody UpdateOrderStatusRequest request) {
+
+        log.info("Updating status for order [{}] to [{}]", orderId, request.newStatus());
+
+        Actor actor = Actor.builder()
+                .id(userId)
+                .email(email)
+                .role(ActorRole.valueOf(role.toUpperCase()))
+                .build();
+
+        Order orderUpdate = UpdateOrderMapper.INSTANCE.toDomain(request);
+
+        Order updated = updateOrderUseCase.updateStatus(
+                orderId,
+                orderUpdate.getStatus(),
+                actor,
+                orderUpdate.getSecurityPin()
+        );
+
+        return ResponseEntity.ok(UpdateOrderMapper.INSTANCE.toResponse(updated));
+    }
+
 
 }

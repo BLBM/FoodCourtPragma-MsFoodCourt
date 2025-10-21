@@ -10,7 +10,7 @@ import co.com.foodcourt.model.order.OrderDish;
 import co.com.foodcourt.model.order.OrderStatus;
 import co.com.foodcourt.model.plate.Dish;
 import co.com.foodcourt.model.restaurant.Restaurant;
-import co.com.foodcourt.usecase.order.OrderUseCase;
+import co.com.foodcourt.usecase.create_order.CreateOrderUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 class OrderPageableServiceTest {
 
     @Mock
-    private OrderUseCase orderUseCase;
+    private CreateOrderUseCase createOrderUseCase;
 
     @InjectMocks
     private OrderPageableService orderPageableService;
@@ -36,7 +36,7 @@ class OrderPageableServiceTest {
     @BeforeEach
     void setUp() {
         PageableService pageableService = new PageableService();
-        orderPageableService = new OrderPageableService(orderUseCase, pageableService);
+        orderPageableService = new OrderPageableService(createOrderUseCase, pageableService);
     }
 
     @Test
@@ -68,7 +68,7 @@ class OrderPageableServiceTest {
                 .dishes(List.of(dish1, dish2))
                 .build();
 
-        when(orderUseCase.getAllOrderByStatus(employeeId, status))
+        when(createOrderUseCase.getAllOrderByStatus(employeeId, status))
                 .thenReturn(List.of(order));
 
         PageResponse<GetAllOrdersData> response =
@@ -89,13 +89,13 @@ class OrderPageableServiceTest {
         assertEquals("PipoBurger Classic", dishData.dishName());
         assertEquals(2, dishData.quantity());
 
-        verify(orderUseCase, times(1))
+        verify(createOrderUseCase, times(1))
                 .getAllOrderByStatus(employeeId, status);
     }
 
     @Test
     void shouldReturnEmptyPage_WhenNoOrdersFound() {
-        when(orderUseCase.getAllOrderByStatus(anyLong(), anyString()))
+        when(createOrderUseCase.getAllOrderByStatus(anyLong(), anyString()))
                 .thenReturn(List.of());
 
         PageResponse<GetAllOrdersData> response =
@@ -105,6 +105,6 @@ class OrderPageableServiceTest {
         assertTrue(response.content().isEmpty());
         assertEquals(0, response.totalElements());
         assertEquals(0, response.totalPages());
-        verify(orderUseCase).getAllOrderByStatus(10L, "DELIVERED");
+        verify(createOrderUseCase).getAllOrderByStatus(10L, "DELIVERED");
     }
 }
