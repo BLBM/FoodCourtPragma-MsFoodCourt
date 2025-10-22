@@ -1,13 +1,19 @@
 package co.com.foodcourt.config;
 
 
+import co.com.foodcourt.model.employee_restaurant.gateways.EmployeeRestaurantRepository;
+import co.com.foodcourt.model.order.gateways.NotificationService;
 import co.com.foodcourt.model.order.gateways.OrderRepository;
+import co.com.foodcourt.model.order.gateways.TraceabilityService;
 import co.com.foodcourt.model.plate.gateways.DishRepository;
 import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
 import co.com.foodcourt.model.user.gateways.UserRepository;
 import co.com.foodcourt.usecase.createrestaurant.CreateRestaurantUseCase;
 import co.com.foodcourt.usecase.dish.DishUseCase;
 import co.com.foodcourt.usecase.create_order.CreateOrderUseCase;
+import co.com.foodcourt.usecase.employee_restaurant.EmployeeRestaurantUseCase;
+import co.com.foodcourt.usecase.traceability_recorder.TraceabilityRecorderUseCase;
+import co.com.foodcourt.usecase.update_order.UpdateOrderUseCase;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -64,6 +70,24 @@ class UseCasesConfigTest {
 
         @Bean
         public OrderRepository orderRepository(){return  Mockito.mock(OrderRepository.class);}
+
+        @Bean
+        public NotificationService notificationService(){return  Mockito.mock(NotificationService.class);}
+
+        @Bean
+        public TraceabilityService traceabilityService(){return  Mockito.mock(TraceabilityService.class);}
+
+        @Bean
+        public TraceabilityRecorderUseCase traceabilityRecorderUseCase(){return Mockito.mock(TraceabilityRecorderUseCase.class);}
+
+        @Bean
+        public UpdateOrderUseCase updateOrderUseCase(){return  Mockito.mock(UpdateOrderUseCase.class);}
+
+        @Bean
+        public EmployeeRestaurantRepository employeeRestaurantRepository(){ return  Mockito.mock(EmployeeRestaurantRepository.class);}
+
+        @Bean
+        public EmployeeRestaurantUseCase employeeRestaurantUseCase(){return Mockito.mock(EmployeeRestaurantUseCase.class);}
 
     }
 

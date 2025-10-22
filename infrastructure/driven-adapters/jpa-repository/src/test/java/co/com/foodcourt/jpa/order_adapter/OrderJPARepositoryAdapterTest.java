@@ -4,11 +4,13 @@ package co.com.foodcourt.jpa.order_adapter;
 
 
 
+import co.com.foodcourt.jpa.common.ErrorConstants;
 import co.com.foodcourt.jpa.entity.*;
 import co.com.foodcourt.jpa.mapper.OrderEntityMapper;
 import co.com.foodcourt.model.order.Order;
 import co.com.foodcourt.model.order.OrderDish;
 import co.com.foodcourt.model.order.OrderStatus;
+import co.com.foodcourt.model.order.exception.OrderNotFoundException;
 import co.com.foodcourt.model.plate.Dish;
 import co.com.foodcourt.model.restaurant.Restaurant;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +20,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -162,6 +165,35 @@ class OrderJPARepositoryAdapterTest {
                 adapter.findByRestaurantAndStatus(1L, invalidStatus));
 
         verifyNoInteractions(repository);
+        verifyNoInteractions(mapper);
+    }
+    /*Feature hu 13*/
+
+
+    @Test
+    void shouldFindOrderByIdSuccessfully() {
+        when(repository.findById(1L)).thenReturn(Optional.of(orderEntity));
+        when(mapper.toDomain(orderEntity)).thenReturn(order);
+
+        Order result = adapter.findById(1L);
+
+        assertNotNull(result);
+        assertEquals(1L, result.getOrderId());
+        verify(repository).findById(1L);
+        verify(mapper).toDomain(orderEntity);
+    }
+
+
+    @Test
+    void shouldThrowExceptionWhenOrderNotFound() {
+        when(repository.findById(1L)).thenReturn(Optional.empty());
+
+        OrderNotFoundException ex = assertThrows(OrderNotFoundException.class, () ->
+                adapter.findById(1L)
+        );
+
+        assertEquals(ErrorConstants.ORDER_NOT_FOUND.getMessage(), ex.getMessage());
+        verify(repository).findById(1L);
         verifyNoInteractions(mapper);
     }
 }

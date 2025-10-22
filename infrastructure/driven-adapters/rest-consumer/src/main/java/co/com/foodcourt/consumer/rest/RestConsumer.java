@@ -38,7 +38,7 @@ public class RestConsumer implements UserRepository
     public User getUserById(Long userId) {
         try {
         String endpoint = String.format("%s/%s", url, userId);
-        log.info("start getUserById :{}", userId);
+        log.info(String.valueOf(LogConstants.REQUEST_MS_AUTH), userId);
         Request request = new Request.Builder()
                 .url(endpoint)
                 .get()
@@ -46,24 +46,25 @@ public class RestConsumer implements UserRepository
                 .build();
 
         UserResponse response = callAndMap(request, UserResponse.class);
-        log.info("success getUserById :{}", response.getRole());
+        log.info(response.getRole(), LogConstants.SUCCESS_MS_AUTH);
         return UserRestMapper.INSTANCE.toDomain(response);
 
         } catch (IOException ex) {
             log.warn(LogConstants.ERROR_GET_USER_BY_ID.getMessage(),ex.getMessage());
-            throw new ExternalServiceException("Error consuming external service");
+            throw new ExternalServiceException(LogConstants.ERROR_MS_AUTH.getMessage());
         }
     }
 
     public User getUserByIdFallback(Long userId, Throwable ex) {
         log.error(LogConstants.ERROR_FALLBACK_EXECUTE.getMessage(), ex.getMessage());
+        log.error(LogConstants.ERROR_FALLBACK_EXECUTE.getMessage(),userId);
 
         return User.builder()
                 .firstName("Unknown")
                 .lastName("Unknown")
                 .email("unknown@example.com")
                 .phone("N/A")
-                .role("Unknown")
+                .role("UnknownRole")
                 .build();
     }
 

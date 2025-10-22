@@ -3,12 +3,10 @@ package co.com.foodcourt.api.controller;
 
 import co.com.foodcourt.api.common.ErrorMessages;
 import co.com.foodcourt.api.common.Rol;
-import co.com.foodcourt.api.dto.CreateOrderRequest;
-import co.com.foodcourt.api.dto.GetAllOrdersData;
-import co.com.foodcourt.api.dto.OrderDishData;
-import co.com.foodcourt.api.dto.PageResponse;
+import co.com.foodcourt.api.dto.*;
 import co.com.foodcourt.api.global_exception_handler.GlobalExceptionHandler;
 import co.com.foodcourt.api.service.OrderPageableService;
+import co.com.foodcourt.model.actor.Actor;
 import co.com.foodcourt.model.order.Order;
 import co.com.foodcourt.model.order.OrderDish;
 import co.com.foodcourt.model.order.OrderStatus;
@@ -16,6 +14,7 @@ import co.com.foodcourt.model.plate.Dish;
 import co.com.foodcourt.model.restaurant.Restaurant;
 import co.com.foodcourt.model.restaurant.exception.RestaurantNotFoundException;
 import co.com.foodcourt.usecase.create_order.CreateOrderUseCase;
+import co.com.foodcourt.usecase.update_order.UpdateOrderUseCase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,6 +50,9 @@ class OrderControllerTest {
     private CreateOrderUseCase createOrderUseCase;
 
     @MockitoBean
+    private UpdateOrderUseCase updateOrderUseCase;
+
+    @MockitoBean
     private OrderPageableService orderPageableService;
 
     private static final String BASE_URL = "/api/v1/orders";
@@ -58,6 +60,7 @@ class OrderControllerTest {
     private static final Long EMPLOYEE_ID = 200L;
     private static final String CLIENT_ROLE = "CLIENT";
     private static final String OWNER_ROLE = "OWNER";
+    private static final String EMAIL_CLIENT = "client@gmail.com";
     private PageResponse<GetAllOrdersData> mockResponse;
 
     @BeforeEach
@@ -106,12 +109,13 @@ class OrderControllerTest {
                         .build()))
                 .build();
 
-        when(createOrderUseCase.createOrder(any(Order.class), eq(CLIENT_ID)))
+        when(createOrderUseCase.createOrder(any(Order.class), any(Actor.class)))
                 .thenReturn(mockOrder);
 
         mockMvc.perform(post(BASE_URL)
                         .header("X-User-id", CLIENT_ID)
                         .header("X-User-role", CLIENT_ROLE)
+                        .header("X-User-Email",EMAIL_CLIENT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -121,7 +125,7 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.status").value("PENDING"))
                 .andExpect(jsonPath("$.creationDate").exists());
 
-        verify(createOrderUseCase).createOrder(any(Order.class), eq(CLIENT_ID));
+        verify(createOrderUseCase).createOrder(any(Order.class), any(Actor.class));
     }
 
     @Test
@@ -134,12 +138,13 @@ class OrderControllerTest {
         mockMvc.perform(post(BASE_URL)
                         .header("X-User-id", CLIENT_ID)
                         .header("X-User-role", OWNER_ROLE)
+                        .header("X-User-Email",EMAIL_CLIENT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.error:").value("Unauthorized"));
 
-        verify(createOrderUseCase, never()).createOrder(any(), anyLong());
+        verify(createOrderUseCase, never()).createOrder(any(), any());
     }
 
     @Test
@@ -158,7 +163,7 @@ class OrderControllerTest {
                         .content(invalidJson))
                 .andExpect(status().isBadRequest());
 
-        verify(createOrderUseCase, never()).createOrder(any(), anyLong());
+        verify(createOrderUseCase, never()).createOrder(any(), any());
     }
 
 
@@ -169,12 +174,13 @@ class OrderControllerTest {
                 List.of(new CreateOrderRequest.DishRequest(10L, 2))
         );
 
-        when(createOrderUseCase.createOrder(any(Order.class), eq(CLIENT_ID)))
+        when(createOrderUseCase.createOrder(any(Order.class), any(Actor.class)))
                 .thenThrow(new RestaurantNotFoundException("Not found Restaurant"));
 
         mockMvc.perform(post(BASE_URL)
                         .header("X-User-id", CLIENT_ID)
                         .header("X-User-role", CLIENT_ROLE)
+                        .header("X-User-Email",EMAIL_CLIENT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
@@ -262,6 +268,44 @@ class OrderControllerTest {
 
         verify(orderPageableService, never())
                 .getOrders(anyLong(), anyString(), anyInt(), anyInt());
+    }
+
+
+    /* Feature hu 13*/
+
+    @Test
+    void shouldUpdateOrderStatusSuccessfully() throws Exception {
+        Long orderId = 1L;
+        Long userId = 10L;
+        String email = "chef@mail.com";
+        String role = "EMPLOYEE";
+
+        UpdateOrderStatusRequest request = new UpdateOrderStatusRequest(OrderStatus.READY.name(), "1234");
+
+        Order updated = Order.builder()
+                .orderId(orderId)
+                .clientId(500L)
+                .status(OrderStatus.READY)
+                .securityPin("1234")
+                .creationDate(LocalDateTime.now())
+                .build();
+
+        when(updateOrderUseCase.updateStatus(eq(orderId), eq(OrderStatus.READY), any(), eq("1234")))
+                .thenReturn(updated);
+
+        mockMvc.perform(patch(BASE_URL + "/{orderId}/status", orderId)
+                        .header("X-User-Id", userId)
+                        .header("X-User-Email", email)
+                        .header("X-User-Role", role)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.orderId").value(orderId))
+                .andExpect(jsonPath("$.status").value("READY"))
+                .andExpect(jsonPath("$.clientId").value(500));
+
+        verify(updateOrderUseCase, times(1))
+                .updateStatus(eq(orderId), eq(OrderStatus.READY), any(), eq("1234"));
     }
 }
 

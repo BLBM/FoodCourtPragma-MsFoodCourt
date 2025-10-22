@@ -55,6 +55,8 @@ whatsapp:
 adapter:
   restconsumer:
     url: ${MS_AUTH_URL}
+  traceability:
+    url: ${MS_TRACEABILITY_URL}
 resilience4j:
   circuitbreaker:
     instances:

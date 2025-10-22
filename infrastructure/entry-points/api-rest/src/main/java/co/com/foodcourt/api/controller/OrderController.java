@@ -74,9 +74,9 @@ public class OrderController {
     )
     @PostMapping
     public ResponseEntity<CreateOrderResponse> createOrder(
-            @RequestHeader("X-User-role") String role,
+            @RequestHeader(name = "X-User-Id") Long userId,
             @RequestHeader(name = "X-User-Email") String email,
-            @RequestHeader("X-User-id") Long clientId,
+            @RequestHeader(name = "X-User-Role") String role,
             @Valid @RequestBody CreateOrderRequest request){
 
         if (!Rol.CLIENT.name().equalsIgnoreCase(role)) {
@@ -84,12 +84,12 @@ public class OrderController {
         }
 
         Actor actor = Actor.builder()
-                .id(clientId)
+                .id(userId)
                 .email(email)
                 .role(ActorRole.valueOf(role.toUpperCase()))
                 .build();
 
-        log.info(LogConstants.CREATE_ORDER_SUCCESS.getMessage(), clientId, request.restaurantId());
+        log.info(LogConstants.CREATE_ORDER_SUCCESS.getMessage(), userId, request.restaurantId());
 
         Order order = createOrderUseCase.createOrder(SaveOrderMapper.INSTANCE.toDomain(request),actor);
 

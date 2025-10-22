@@ -1,6 +1,7 @@
 package co.com.foodcourt.callmebot;
 
 import co.com.foodcourt.model.order.gateways.NotificationService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,25 +12,28 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class WhatsAppNotificationAdapter implements NotificationService {
 
 
-    private static final String WHATSAPP_SENT= "WhatsApp sent to 3155849871 - Response: {}";
+    private static final String WHATSAPP_SENT = "WhatsApp sent to 3155849871 - Response: {}";
     private static final String ERROR_MESSAGE = "Error sending whatsapp message";
 
+    private final RestTemplate restTemplate;
+    private final String apiUrl;
+    private final String apiKey;
+    private final String defaultPhone;
 
-    private final RestTemplate restTemplate = new RestTemplate();
-
-    @Value("${whatsapp.api.url}")
-    private String apiUrl;
-
-    @Value("${whatsapp.api.key}")
-    private String apiKey;
-
-    @Value("${whatsapp.api.default-phone}")
-    private String defaultPhone;
-
-
+    public WhatsAppNotificationAdapter(
+            @Value("${whatsapp.api.url}") String apiUrl,
+            @Value("${whatsapp.api.key}") String apiKey,
+            @Value("${whatsapp.api.default-phone}") String defaultPhone,
+            RestTemplate restTemplate) {
+        this.apiUrl = apiUrl;
+        this.apiKey = apiKey;
+        this.defaultPhone = defaultPhone;
+        this.restTemplate = restTemplate;
+    }
 
     @Override
     public void sendOrderReadyNotification(String msg) {

@@ -127,7 +127,7 @@ class RestConsumerTest {
         assertEquals("Unknown", fallbackUser.getLastName());
         assertEquals("unknown@example.com", fallbackUser.getEmail());
         assertEquals("N/A", fallbackUser.getPhone());
-        assertEquals("Unknown", fallbackUser.getRole());
+        assertEquals("UnknownRole", fallbackUser.getRole());
     }
     
 

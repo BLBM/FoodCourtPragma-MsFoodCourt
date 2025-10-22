@@ -14,6 +14,7 @@ local.properties
 .loadpath
 .recommenders
 .env
+htmlReport
 
 
 # External tool builders

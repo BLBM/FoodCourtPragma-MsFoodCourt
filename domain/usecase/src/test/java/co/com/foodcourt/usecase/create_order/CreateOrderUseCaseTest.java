@@ -14,6 +14,7 @@ import co.com.foodcourt.model.restaurant.Restaurant;
 import co.com.foodcourt.model.restaurant.gateways.RestaurantRepository;
 import co.com.foodcourt.usecase.common.ValidationMessages;
 import co.com.foodcourt.usecase.exception.ValidationException;
+import co.com.foodcourt.usecase.traceability_recorder.TraceabilityRecorderUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +41,9 @@ class CreateOrderUseCaseTest {
 
     @Mock
     private EmployeeRestaurantRepository employeeRestaurantRepository;
+
+    @Mock
+    private TraceabilityRecorderUseCase traceabilityRecorderUseCase;
 
     @InjectMocks
     private CreateOrderUseCase createOrderUseCase;
